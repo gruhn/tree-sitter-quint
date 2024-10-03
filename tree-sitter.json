@@ -1,0 +1,8 @@
+{
+  "grammars": [
+    {
+      "scope": "source.quint",
+      "file-types": ["qnt"]
+    }
+  ]
+}

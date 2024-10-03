@@ -4,6 +4,8 @@ module bank {
   var balances: str -> int
  
   pure val ADDRESSES = Set("alice", "bob", "charlie")
+
+  pure val test = _ => 42
  
   action deposit(account, amount) = {
     // Increment balance of account by amount

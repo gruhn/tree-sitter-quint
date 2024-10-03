@@ -136,16 +136,16 @@ module.exports = grammar({
       ),
 
       // operator name:
-      $.identifier,
+      field('name', $.identifier),
 
       // argument list:
-      optional($.typed_argument_list),
+      field('arguments', optional($.typed_argument_list)),
 
       // operator type:
       optional(seq(':', $.type)),
 
       '=', 
-      $.expr, 
+      field('rhs', $.expr), 
       optional(';')
     ),
 
@@ -363,3 +363,4 @@ function withParens(rule) {
 function withBraces(rule) {
   return seq('{', rule, '}')
 }
+

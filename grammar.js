@@ -20,7 +20,6 @@ module.exports = grammar({
         $.variable_definition,
         $.operator_definition,
         $.type_alias,
-        $.nondet_choice,
       )
     ),
 
@@ -74,15 +73,17 @@ module.exports = grammar({
       $.operator_type,
       $.function_type,
       $.polymorphic_type,
+      $.sum_type, // QUESTION: are sum types allowed everywhere?
     ),
 
-    // TODO: what operator precedence?
-    function_type: $ => prec.right(1, seq($.type, '->', $.type)),
+    function_type: $ => prec.right('function_type', seq($.type, '->', $.type)),
 
-    // TODO: what operator precedence?
-    operator_type: $ => prec.right(1, seq($.type, '=>', $.type)),
+    operator_type: $ => prec.right('operator_type', seq($.type, '=>', $.type)),
 
     polymorphic_type: $ => seq($.identifier, '[', $.type, ']'),
+
+    // TODO: can type constructors have more/less than one argument?
+    sum_type: $ => sepBy1('|', seq($.identifier, withParens($.type))),
 
     /////////// Module-level constructs ///////////
     
@@ -94,7 +95,6 @@ module.exports = grammar({
           $.variable_definition,
           $.operator_definition,
           $.type_alias,
-          $.nondet_choice,
         )),
       '}',
     ),
@@ -111,12 +111,9 @@ module.exports = grammar({
       'var', $.identifier, ':', $.type
     ),
 
-    nondet_choice: $ => seq(
-      'nondet', $.identifier, '=', $.expr
-    ),
-
     typed_argument_list: $ => withParens(
-      sepByComma1(
+      sepBy1(
+        ',',
         seq(
           $.identifier,
           optional(seq(':', $.type))
@@ -132,7 +129,8 @@ module.exports = grammar({
           choice('val', 'def')
         ),
         'action', 
-        'temporal'
+        'temporal',
+        'run'
       ),
 
       // operator name:
@@ -162,7 +160,7 @@ module.exports = grammar({
 
     // TODO:
     expr: $ => choice(
-      withParens($.expr),
+      prec('parens', withParens($.expr)),
       withBraces($.expr),
       $.bool_literal,
       $.int_literal,
@@ -179,6 +177,10 @@ module.exports = grammar({
       $.braced_all,      
       $.string,
       $.if_else_condition,
+      $.nondet_choice,
+      $.record_literal,
+      $.tuple_literal,
+      $.list_literal,
       '1 to 10', // TODO
     ),
 
@@ -211,7 +213,7 @@ module.exports = grammar({
         $.identifier,
         // TODO: can lambdas args have type annotations?
         // TODO: pattern matching in lambda args.
-        withParens(sepByComma($.expr)),
+        withParens(sepBy(',', $.expr)),
       ),
       '=>',     
       $.expr
@@ -219,7 +221,7 @@ module.exports = grammar({
 
     operator_application: $ => seq(
       field('operator', $.identifier),
-      field('arguments', withParens(sepByComma($.expr))),
+      field('arguments', withParens(sepBy(',', $.expr))),
     ),
 
     list_access: $ => prec.left('list_access', seq($.expr, '[', $.expr, ']')),
@@ -252,12 +254,32 @@ module.exports = grammar({
       prec.left ('pair'          , seq($.expr, '->'     , $.expr)),
     ),
 
-    braced_and: $ => prec('braced_and', seq('and', withBraces(sepEndByComma($.expr)))),
-    braced_or: $ => prec('braced_or',   seq('or', withBraces(sepEndByComma($.expr)))),
-    braced_all: $ => prec('braced_all', seq('all', withBraces(sepEndByComma($.expr)))),
-    braced_any: $ => prec('braced_any', seq('any', withBraces(sepEndByComma($.expr)))),
+    braced_and: $ => prec('braced_and', seq('and', withBraces(sepEndBy(',', $.expr)))),
+    braced_or: $ => prec('braced_or',   seq('or', withBraces(sepEndBy(',', $.expr)))),
+    braced_all: $ => prec('braced_all', seq('all', withBraces(sepEndBy(',', $.expr)))),
+    braced_any: $ => prec('braced_any', seq('any', withBraces(sepEndBy(',', $.expr)))),
 
     if_else_condition: $ => prec('if_else', seq('if', withParens($.expr), 'then', $.expr, 'else', $.expr)),
+
+    nondet_choice: $ => prec.right('nondet_choice', seq(
+      'nondet', $.identifier, '=', $.expr, choice(';', '\n'), $.expr
+    )),
+
+    record_literal: $ => withBraces(
+      sepBy1(
+        ',',
+        choice(
+          seq($.identifier, ':', $.expr),
+          seq('...', $.identifier) // record spread
+        )
+      )
+    ),
+
+    tuple_literal: $ => prec('tuple', withParens(sepBy(',', $.expr))),
+
+    list_literal: $ => withBrackets(sepBy(',', $.expr)),
+
+    // TODO: nested operator definitions
 
   },
 
@@ -288,60 +310,65 @@ module.exports = grammar({
       'pair',
       'braced_all',
       'braced_any',
+      'nondet_choice', // TODO: docs don't specify precedence
       'if_else', // TODO: docs don't specify precedence
+    ],
+    [
+      'tuple',
+      'parens',
+    ],
+    [
+      'function_type',
+      'operator_type',
     ]
   ],
 
 });
 
 /**
- * Creates a rule to match one or more of the rules separated by a comma
  *
+ * @param {string} sep
  * @param {Rule} rule
  *
  * @return {SeqRule}
  *
  */
-function sepByComma1(rule) {
-  return seq(rule, repeat(seq(',', rule)));
+function sepBy1(sep, rule) {
+  return seq(rule, repeat(seq(sep, rule)))
 }
 
 /**
- * Creates a rule to match zero or more of the rules separated by a comma
  *
+ * @param {string} sep
  * @param {Rule} rule
  *
  * @return {Rule}
  *
  */
-function sepByComma(rule) {
-  return optional(sepByComma1(rule))
+function sepBy(sep, rule) {
+  return optional(sepBy1(sep, rule))
 }
 
 /**
- * Creates a rule to match one or more of the rules separated by a comma
- * and optionally ended by a comma.
  *
- * @param {Rule} rule
- *
- * @return {SeqRule}
- *
- */
-function sepEndByComma1(rule) {
-  return seq(sepByComma1(rule), optional(','))
-}
-
-/**
- * Creates a rule to match one or more of the rules separated by a comma
- * and optionally ended by a comma.
- *
+ * @param {string} sep
  * @param {Rule} rule
  *
  * @return {Rule}
  *
- */
-function sepEndByComma(rule) {
-  return optional(sepEndByComma1(rule))
+ */function sepEndBy1(sep, rule) {
+  return seq(sepBy1(sep, rule), optional(','))
+}
+
+/**
+ *
+ * @param {string} sep
+ * @param {Rule} rule
+ *
+ * @return {Rule}
+ *
+ */function sepEndBy(sep, rule) {
+  return optional(sepEndBy1(sep, rule))
 }
 
 /**
@@ -362,5 +389,15 @@ function withParens(rule) {
  */
 function withBraces(rule) {
   return seq('{', rule, '}')
+}
+
+/**
+ * @param {Rule} rule
+ *
+ * @return {Rule}
+ *
+ */
+function withBrackets(rule) {
+  return seq('[', rule, ']')
 }
 

@@ -306,18 +306,21 @@ type INT_SET = Set[int]
           (identifier))))))
 
 ========================
-Non-Deterministic Choice
+Sum Type
 ========================
 
-nondet i = oneOf(Int)
+type Elem = S(str) | I(int)
  
 ---
 
 (source_file
-  (nondet_choice
+  (type_alias
     (identifier)
-    (expr
-      (operator_application
+    (type
+      (sum_type
         (identifier)
-        (expr
-          (well_known_set))))))
+        (type
+          (identifier))
+        (identifier)
+        (type
+          (identifier))))))

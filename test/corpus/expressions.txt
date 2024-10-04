@@ -312,3 +312,215 @@ val _ =
               (identifier))
             (expr
               (identifier))))))))           
+
+
+========================
+Non-Deterministic Choice
+========================
+
+action _ = {
+  nondet i1 = e1
+  nondet i2 = e2
+  e3
+}
+ 
+---
+
+(source_file
+  (operator_definition
+    (identifier)
+    (expr
+      (expr
+        (nondet_choice
+          (identifier)
+          (expr
+            (identifier))
+          (expr
+            (nondet_choice
+              (identifier)
+              (expr
+                (identifier))
+              (expr
+                (identifier)))))))))
+
+===========================
+Map Constructor
+===========================
+
+val _ = Map(k_1 -> v_1, k_2 -> v_2, k_3 -> v_3)
+
+---
+
+(source_file
+  (operator_definition
+    (identifier)
+    (expr
+      (operator_application
+        (identifier)
+        (expr
+          (binary_expr
+            (expr
+              (identifier))
+            (expr
+              (identifier))))
+        (expr
+          (binary_expr
+            (expr
+              (identifier))
+            (expr
+              (identifier))))
+        (expr
+          (binary_expr
+            (expr
+              (identifier))
+            (expr
+              (identifier))))))))
+
+============================
+Record Constructor
+============================
+
+val _ = { f_1: e_1, f_2: e_2, f_3: e_3 }
+
+---
+
+(source_file
+  (operator_definition
+    (identifier)
+    (expr
+      (record_literal
+        (identifier)
+        (expr
+          (identifier))
+        (identifier)
+        (expr
+          (identifier))
+        (identifier)
+        (expr
+          (identifier))))))
+
+============================
+Record Spread
+============================
+
+val r = { f_2: e_2, f_3: e_3 }
+val _ = { f_1: e_1, ...r }
+
+---
+
+(source_file
+  (operator_definition
+    (identifier)
+    (expr
+      (record_literal
+        (identifier)
+        (expr
+          (identifier))
+        (identifier)
+        (expr
+          (identifier)))))
+  (operator_definition
+    (identifier)
+    (expr
+      (record_literal
+        (identifier)
+        (expr
+          (identifier))
+        (identifier)))))
+
+============================
+Convert Set of Pairs to Map
+============================
+
+val _ = Set((1, true), (2, false)).setToMap()
+
+---
+
+(source_file
+  (operator_definition
+    (identifier)
+    (expr
+      (binary_expr
+        (expr
+          (operator_application
+            (identifier)
+            (expr
+              (tuple_literal
+                (expr
+                  (int_literal))
+                (expr
+                  (bool_literal))))
+            (expr
+              (tuple_literal
+                (expr
+                  (int_literal))
+                (expr
+                  (bool_literal))))))
+        (operator_application
+          (identifier))))))
+
+============================
+Tuple Constructor
+============================
+
+val _ = ()
+val _ = (e_1)
+val _ = (e_1, e_2, e_3)
+
+---
+
+(source_file
+  (operator_definition
+    (identifier)
+    (expr
+      (tuple_literal)))
+  (operator_definition
+    (identifier)
+    (expr
+      (tuple_literal
+        (expr
+          (identifier)))))
+  (operator_definition
+    (identifier)
+    (expr
+      (tuple_literal
+        (expr
+          (identifier))
+        (expr
+          (identifier))
+        (expr
+          (identifier))))))
+
+============================
+List Constructor
+============================
+
+val _ = []
+val _ = [e_1]
+val _ = [e_1, e_2, e_3]
+
+---
+
+(source_file
+  (operator_definition
+    (identifier)
+    (expr
+      (list_literal)))
+  (operator_definition
+    (identifier)
+    (expr
+      (list_literal
+        (expr
+          (identifier)))))
+  (operator_definition
+    (identifier)
+    (expr
+      (list_literal
+        (expr
+          (identifier))
+        (expr
+          (identifier))
+        (expr
+          (identifier))))))
+
+

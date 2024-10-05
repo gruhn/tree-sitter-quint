@@ -49,6 +49,8 @@ jobs:
         run: |-
           rm .gitignore
           mv release.gitignore .gitignore
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
           git add --all 
           git commit -m "Release master at ${{ github.sha }}"
       # - name: Push to Release Branch

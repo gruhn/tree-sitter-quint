@@ -5,13 +5,6 @@
   "module"
   ; "from"
   ; "as"
-  ; "not"
-  "or"
-  "and"
-  "implies"
-  "iff"
-  "all"
-  "any"
   "type"
   "assume"
   "const"
@@ -22,12 +15,24 @@
   "pure"
   "action"
   "temporal"
+  "run"
 ] @keyword
 
-[
-  "if"
-  "else"
-] @keyword.control.conditional
+(match_expr "match" @keyword.control.conditional)
+
+(if_else_condition 
+  "if" @keyword.control.conditional
+  "else" @keyword.control.conditional)
+
+; [
+;   "or"
+;   "and"
+;   "implies"
+;   "iff"
+;   "all"
+;   "any"
+;   ; "not"
+; ] @keyword.operator
 
 ; [
 ;   "import"
@@ -64,8 +69,17 @@
   ">="
   "^"
   "->"
-  ; TODO: and, or, iff, implies
 ] @operator
+
+(infix_and "and" @operator)
+(infix_or "or" @operator)
+(infix_iff "iff" @operator)
+(infix_implies "implies" @operator)
+
+(braced_and "and" @keyword)
+(braced_or "or" @keyword)
+(braced_all "all" @keyword)
+(braced_any "any" @keyword)
 
 [
   "("
@@ -75,6 +89,9 @@
   "{"
   "}"
 ] @punctuation.bracket
+
+(polymorphic_type 
+  (type) @type.parameter)
 
 (type) @type
 (int_literal) @constant.numeric.integer

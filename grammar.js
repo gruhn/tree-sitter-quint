@@ -181,7 +181,7 @@ module.exports = grammar({
       $.record_literal,
       $.tuple_literal,
       $.list_literal,
-      '1 to 10', // TODO
+      $.match_expr,
     ),
 
     well_known_set: $ => choice('Bool', 'Int', 'Nat'),
@@ -246,20 +246,25 @@ module.exports = grammar({
       prec.left ('comparison'    , seq($.expr, '<='     , $.expr)),
       prec.left ('comparison'    , seq($.expr, '=='     , $.expr)),
       prec.left ('comparison'    , seq($.expr, '!='     , $.expr)),
+      $.infix_and,
+      $.infix_or,
+      $.infix_iff,
+      $.infix_implies,
       prec.left ('delayed_assign', seq($.expr, '\' ='   , $.expr)),
-      prec.left ('infix_and'     , seq($.expr, 'and'    , $.expr)),
-      prec.left ('infix_or'      , seq($.expr, 'or'     , $.expr)),
-      prec.left ('infix_iff'     , seq($.expr, 'iff'    , $.expr)),
-      prec.left ('infix_implies' , seq($.expr, 'implies', $.expr)),
       prec.left ('pair'          , seq($.expr, '->'     , $.expr)),
     ),
+
+    infix_and: $ => prec.left('infix_and', seq($.expr, 'and', $.expr)),
+    infix_or: $ => prec.left('infix_or', seq($.expr, 'or', $.expr)),
+    infix_iff: $ => prec.left('infix_iff', seq($.expr, 'iff', $.expr)),
+    infix_implies: $ => prec.left ('infix_implies' , seq($.expr, 'implies', $.expr)),
 
     braced_and: $ => prec('braced_and', seq('and', withBraces(sepEndBy(',', $.expr)))),
     braced_or: $ => prec('braced_or',   seq('or', withBraces(sepEndBy(',', $.expr)))),
     braced_all: $ => prec('braced_all', seq('all', withBraces(sepEndBy(',', $.expr)))),
     braced_any: $ => prec('braced_any', seq('any', withBraces(sepEndBy(',', $.expr)))),
 
-    if_else_condition: $ => prec('if_else', seq('if', withParens($.expr), 'then', $.expr, 'else', $.expr)),
+    if_else_condition: $ => prec('if_else', seq('if', withParens($.expr), $.expr, 'else', $.expr)),
 
     nondet_choice: $ => prec.right('nondet_choice', seq(
       'nondet', $.identifier, '=', $.expr, choice(';', '\n'), $.expr
@@ -276,6 +281,10 @@ module.exports = grammar({
     ),
 
     tuple_literal: $ => prec('tuple', withParens(sepBy(',', $.expr))),
+
+    match_expr: $ => seq('match', $.expr, withBraces(
+      repeat(seq('|', $.identifier, withParens($.expr), '=>', $.expr))
+    )),
 
     list_literal: $ => withBrackets(sepBy(',', $.expr)),
 

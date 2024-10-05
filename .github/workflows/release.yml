@@ -1,0 +1,63 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  release:
+    name: Build release artifacts
+    runs-on: ubuntu-20.04
+    env:
+      REPO_NAME: ${{github.event.repository.name}}
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with: 
+          ref: 'release'
+          # fetch full commit history:
+          fetch-depth: '0'
+      - name: Checkout master state
+        run: git checkout origin/master -- .
+      #- name: Set up Emscripten
+      #  uses: mymindstorm/setup-emsdk@v14
+      #  with:
+      #    version: '3.1.64'
+      - name: Set up tree-sitter CLI
+        uses: tree-sitter/setup-action/cli@v1
+      - name: Install parser dependencies
+        run: |-
+          JQ_SCRIPT='.dependencies | del(."node-addon-api", ."node-gyp-build") | length > 0'
+          if jq -e "$JQ_SCRIPT" package.json >/dev/null; then
+            npm i --omit dev --omit peer --omit optional
+          fi
+      - name: Generate parser
+        run: tree-sitter generate
+      - name: Run Tests
+        run: tree-sitter test
+      #- name: Build Wasm binaries
+      #  shell: bash
+      #  run: |-
+      #    while read -r grammar; do
+      #      tree-sitter build --wasm "${grammar%/grammar.js}"
+      #    done < <(find -name grammar.js -not -path './node_modules/*')
+      - name: Push to Release Branch
+        shell: bash
+        run: |-
+          rm .gitignore
+          mv release.gitignore .gitignore
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+          git add --all 
+          git commit -m "Release master at ${{ github.sha }}"
+          git push 
+      # - name: Push to Release Branch
+      #   uses: s0/git-publish-subdir-action@develop
+      #   env:
+      #     REPO: self
+      #     BRANCH: release
+      #     FOLDER: .
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

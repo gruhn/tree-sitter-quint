@@ -1,0 +1,326 @@
+========================
+Module Definition
+========================
+
+module my_module {
+  // module body ...
+}
+
+---
+
+(source_file
+  (module_definition
+    (identifier)
+    (comment)))
+
+========================
+Constant declarations
+========================
+      
+const N: int
+const Proc: Set[str]
+
+---
+(source_file
+  (constant_declaration
+    (identifier)
+    (type
+      (identifier)))
+  (constant_declaration
+    (identifier)
+    (type
+      (polymorphic_type
+        (identifier)
+        (type
+          (identifier))))))
+
+========================
+Assumptions
+========================
+      
+assume AtLeast4 = N >= 4
+
+---
+
+(source_file
+  (assumption
+    (identifier)
+    (expr
+      (binary_expr
+        (expr
+          (identifier))
+        (expr
+          (int_literal))))))
+
+========================
+Variable Definitions
+========================
+      
+var name: str
+var timer: int
+var isArmed: bool
+
+---
+  
+(source_file
+  (variable_definition
+    (identifier)
+    (type
+      (identifier)))
+  (variable_definition
+    (identifier)
+    (type
+      (identifier)))
+  (variable_definition
+    (identifier)
+    (type
+      (identifier))))
+
+
+========================
+Static Constant Value
+========================
+    
+pure val Nodes: Set[int] = 1 to 10
+
+---
+
+(source_file
+  (operator_definition
+    (identifier)
+    (type
+      (polymorphic_type
+        (identifier)
+        (type
+          (identifier))))
+    (expr)))
+
+
+==========================================
+Definition with Optional Ending Semicolon
+==========================================
+    
+pure val eleven = 11;
+
+---
+
+(source_file
+  (operator_definition
+    (identifier)
+    (expr
+      (int_literal)))) 
+
+========================
+Two-Argument Operator
+========================
+    
+pure def fst(x: int, y: int): int = 
+  x
+
+---
+
+(source_file
+  (operator_definition
+    (identifier)
+    (typed_argument_list
+      (identifier)
+      (type
+        (identifier))
+      (identifier)
+      (type
+        (identifier)))
+    (type
+      (identifier))
+    (expr
+      (identifier))))
+
+========================
+Higher-Order Operator
+========================
+
+pure def F(G: a => b, x: a): b = G(x)
+
+---
+
+(source_file
+  (operator_definition
+    (identifier)
+    (typed_argument_list
+      (identifier)
+      (type
+        (operator_type
+          (type
+            (identifier))
+          (type
+            (identifier))))
+      (identifier)
+      (type
+        (identifier)))
+    (type
+      (identifier))
+    (expr
+      (operator_application
+        (identifier)
+        (expr
+          (identifier))))))
+ 
+========================
+Stateful Variable
+========================
+
+var timer: int
+
+---
+
+(source_file
+  (variable_definition
+    (identifier)
+    (type
+      (identifier))))
+
+========================
+State Dependent Value
+========================
+
+val isTimerPositive =
+    timer >= 0
+
+---
+
+(source_file
+  (operator_definition
+    (identifier)
+    (expr
+      (binary_expr
+        (expr
+          (identifier))
+        (expr
+          (int_literal))))))
+
+========================
+State Dependent Operator
+========================
+
+def hasExpired(timestamp: int) =
+    timer >= timestamp
+ 
+---
+
+(source_file
+  (operator_definition
+    (identifier)
+    (typed_argument_list
+      (identifier)
+      (type
+        (identifier)))
+    (expr
+      (binary_expr
+        (expr
+          (identifier))
+        (expr
+          (identifier))))))
+
+========================
+Action without Argument
+========================
+
+action init =
+  timer' = 0
+ 
+---
+
+(source_file
+  (operator_definition
+    (identifier)
+    (expr
+      (binary_expr
+        (expr
+          (identifier))
+        (expr
+          (int_literal))))))
+
+========================
+Action with Argument
+========================
+
+action advance(unit: int) =
+  timer' = timer + unit
+ 
+---
+
+(source_file
+  (operator_definition
+    (identifier)
+    (typed_argument_list
+      (identifier)
+      (type
+        (identifier)))
+    (expr
+      (binary_expr
+        (expr
+          (identifier))
+        (expr
+          (binary_expr
+            (expr
+              (identifier))
+            (expr
+              (identifier))))))))
+
+========================
+Temporal Formula
+========================
+
+temporal neverNegative =
+    always(timer >= 0)
+ 
+---
+
+(source_file
+  (operator_definition
+    (identifier)
+    (expr
+      (operator_application
+        (identifier)
+        (expr
+          (binary_expr
+            (expr
+              (identifier))
+            (expr
+              (int_literal))))))))
+
+========================
+Type Alias
+========================
+
+type INT_SET = Set[int]
+ 
+---
+
+(source_file
+  (type_alias
+    (identifier)
+    (type
+      (polymorphic_type
+        (identifier)
+        (type
+          (identifier))))))
+
+========================
+Sum Type
+========================
+
+type Elem = S(str) | I(int)
+ 
+---
+
+(source_file
+  (type_alias
+    (identifier)
+    (type
+      (sum_type
+        (identifier)
+        (type
+          (identifier))
+        (identifier)
+        (type
+          (identifier))))))

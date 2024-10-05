@@ -1,0 +1,4 @@
+# files even ignored on release branch
+
+.direnv/
+node_modules

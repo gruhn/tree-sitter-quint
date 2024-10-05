@@ -1,0 +1,73 @@
+========================
+String
+========================
+
+"hello, world!"
+
+---
+
+(source_file
+  (string
+	(string_fragment)))
+
+========================
+Escaped String
+========================
+
+"Having \"quotes\" inside a string"
+
+---
+
+(source_file
+  (string
+    (string_fragment)
+    (escape_sequence)
+    (string_fragment)
+    (escape_sequence)
+    (string_fragment)))
+
+=================================
+String with Escaped Escape Symbol
+=================================
+
+"The symbol \\ is called a slash"
+
+---
+
+(source_file
+  (string
+    (string_fragment)
+    (escape_sequence)
+    (string_fragment)))
+
+========================
+Single Line Comments
+========================
+
+// this is a one-line comment
+"some string" // this is also a one-line comment
+
+---
+
+(source_file
+  (comment)
+  (string
+    (string_fragment))
+  (comment))
+
+========================
+Multi Line Comment
+========================
+
+/*
+ This is a multi-line comment.
+ We are writing comments like in:
+ C, C++, Go, Java, Scala, Rust, JavaScript, CSS, etc.
+ 
+ This is the principle of the least surprise.
+*/
+
+---
+
+(source_file
+  (comment))

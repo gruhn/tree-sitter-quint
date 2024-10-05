@@ -21,7 +21,7 @@ jobs:
           # fetch full commit history:
           fetch-depth: '0'
       - name: Checkout master state
-        run: git reset --hard origin/master
+        run: git checkout origin/master -- .
       #- name: Set up Emscripten
       #  uses: mymindstorm/setup-emsdk@v14
       #  with:
@@ -44,7 +44,7 @@ jobs:
       #    while read -r grammar; do
       #      tree-sitter build --wasm "${grammar%/grammar.js}"
       #    done < <(find -name grammar.js -not -path './node_modules/*')
-      - name: 
+      - name: Push to Release Branch
         shell: bash
         run: |-
           rm .gitignore

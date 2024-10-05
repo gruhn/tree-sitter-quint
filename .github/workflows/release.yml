@@ -16,6 +16,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with: 
+          ref: 'release'
+          # fetch full commit history:
+          fetch-depth: '0'
+      - name: Checkout master state
+        run: git reset --hard origin/master
       #- name: Set up Emscripten
       #  uses: mymindstorm/setup-emsdk@v14
       #  with:
@@ -38,15 +44,17 @@ jobs:
       #    while read -r grammar; do
       #      tree-sitter build --wasm "${grammar%/grammar.js}"
       #    done < <(find -name grammar.js -not -path './node_modules/*')
-      - name: Build Wasm binaries
+      - name: 
         shell: bash
         run: |-
           rm .gitignore
           mv release.gitignore .gitignore
-      - name: Push to Release Branch
-        uses: s0/git-publish-subdir-action@develop
-        env:
-          REPO: self
-          BRANCH: release
-          FOLDER: .
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          git add --all 
+          git commit -m "Release master at ${{ github.sha }}"
+      # - name: Push to Release Branch
+      #   uses: s0/git-publish-subdir-action@develop
+      #   env:
+      #     REPO: self
+      #     BRANCH: release
+      #     FOLDER: .
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

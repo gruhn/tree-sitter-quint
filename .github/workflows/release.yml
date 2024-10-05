@@ -28,6 +28,8 @@ jobs:
           fi
       - name: Generate parser
         run: tree-sitter generate
+      - name: Run Tests
+        run: tree-sitter test
       #- name: Build Wasm binaries
       #  shell: bash
       #  run: |-

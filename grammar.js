@@ -2,7 +2,7 @@
 // @ts-check
 
 module.exports = grammar({
-  name: 'qunit',
+  name: 'quint',
 
   rules: {
     // TODO: what top-level constructs are allowed?

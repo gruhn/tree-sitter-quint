@@ -53,6 +53,7 @@ jobs:
           git config user.email "<>"
           git add --all 
           git commit -m "Release master at ${{ github.sha }}"
+          git push 
       # - name: Push to Release Branch
       #   uses: s0/git-publish-subdir-action@develop
       #   env:

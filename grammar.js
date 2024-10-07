@@ -69,21 +69,39 @@ module.exports = grammar({
 
     // TODO: all types covered?
     type: $ => choice(
-      $.identifier, // basic type
+      prec('basic_type', $.identifier), // basic type
       $.operator_type,
       $.function_type,
       $.polymorphic_type,
-      $.sum_type, // QUESTION: are sum types allowed everywhere?
     ),
 
+    // QUESTION: function types always have exaclty one argument?
     function_type: $ => prec.right('function_type', seq($.type, '->', $.type)),
 
-    operator_type: $ => prec.right('operator_type', seq($.type, '=>', $.type)),
+    operator_type: $ => prec.right('operator_type', seq(
+      choice(
+        $.type, // single argument / no parens, e.g. `int => bool`
+        withParens(sepBy(',', $.type)), // zero or more arguments, e.g. `(int, int) => int`
+      ),
+      "=>",
+      $.type, // result type
+    )),
 
-    polymorphic_type: $ => seq($.identifier, '[', $.type, ']'),
+    polymorphic_type: $ => seq(
+      $.identifier, 
+      withBrackets(sepBy1(',', $.type))
+    ),
 
-    // TODO: can type constructors have more/less than one argument?
-    sum_type: $ => sepBy1('|', seq($.identifier, withParens($.type))),
+    // TODO: can variant constructors have more than one argument?
+    variant_constructor: $ => prec('variant_constr', seq(
+      $.identifier, 
+      optional(withParens($.type))
+    )),
+
+    // We say sum types must have at least two variant constructor.
+    // One variant constructor makes sense, but can't be distingished
+    // with a basic type like `int`.
+    sum_type: $ => sepBy1('|', $.variant_constructor),
 
     /////////// Module-level constructs ///////////
     
@@ -112,7 +130,7 @@ module.exports = grammar({
     ),
 
     typed_argument_list: $ => withParens(
-      sepBy1(
+      sepBy(
         ',',
         seq(
           $.identifier,
@@ -150,7 +168,16 @@ module.exports = grammar({
     // TODO: https://quint-lang.org/docs/lang#module-instances
 
     // TODO: type alias identifier must be all CAPS
-    type_alias: $ => seq('type', $.identifier, '=', $.type),
+    type_alias: $ => seq(
+      'type', 
+      $.identifier, 
+      optional(withBrackets(sepBy1(',', $.identifier))), // optional type arguments
+      '=', 
+      choice(
+        $.type, 
+        $.sum_type,
+      )
+    ),
 
     /////////// Namespaces and Imports  ///////////
 
@@ -329,6 +356,8 @@ module.exports = grammar({
     [
       'function_type',
       'operator_type',
+      'variant_constr',
+      'basic_type',
     ]
   ],
 

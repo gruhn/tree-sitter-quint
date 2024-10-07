@@ -93,6 +93,8 @@
 (polymorphic_type 
   (type) @type.parameter)
 
+(variant_constructor) @type.enum.variant
+
 (type) @type
 (int_literal) @constant.numeric.integer
 (comment) @comment

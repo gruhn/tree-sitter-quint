@@ -81,7 +81,7 @@ var isArmed: bool
 Static Constant Value
 ========================
     
-pure val Nodes: Set[int] = 1 to 10
+pure val Nodes: Set[int] = 1.to(10)
 
 ---
 
@@ -93,7 +93,14 @@ pure val Nodes: Set[int] = 1 to 10
         (identifier)
         (type
           (identifier))))
-    (expr)))
+    (expr
+      (binary_expr
+        (expr
+          (int_literal))
+        (operator_application
+          (identifier)
+          (expr
+            (int_literal)))))))
 
 
 ==========================================
@@ -109,6 +116,23 @@ pure val eleven = 11;
     (identifier)
     (expr
       (int_literal)))) 
+
+========================
+Two-Argument Operator
+========================
+    
+pure def fst(): int = 1
+
+---
+
+(source_file
+  (operator_definition
+    (identifier)
+    (typed_argument_list)
+    (type
+      (identifier))
+    (expr
+      (int_literal))))
 
 ========================
 Two-Argument Operator
@@ -309,7 +333,33 @@ type INT_SET = Set[int]
 Sum Type
 ========================
 
-type Elem = S(str) | I(int)
+type Elem = S(str) | I(int) | Nil
+ 
+---
+
+(source_file
+  (type_alias
+    (identifier)
+    (sum_type
+      (variant_constructor
+        (identifier)
+        (type
+          (identifier)))
+      (variant_constructor
+        (identifier)
+        (type
+          (identifier)))
+      (variant_constructor
+        (identifier)))))
+
+========================
+Operator Type
+========================
+
+type _ = int => int
+type _ = () => int
+type _ = (int) => int
+type _ = (int, bool) => int
  
 ---
 
@@ -317,10 +367,54 @@ type Elem = S(str) | I(int)
   (type_alias
     (identifier)
     (type
-      (sum_type
-        (identifier)
+      (operator_type
         (type
           (identifier))
-        (identifier)
+        (type
+          (identifier)))))
+  (type_alias
+    (identifier)
+    (type
+      (operator_type
+        (type
+          (identifier)))))
+  (type_alias
+    (identifier)
+    (type
+      (operator_type
+        (type
+          (identifier))
+        (type
+          (identifier)))))
+  (type_alias
+    (identifier)
+    (type
+      (operator_type
+        (type
+          (identifier))
+        (type
+          (identifier))
         (type
           (identifier))))))
+
+========================
+Function Type
+========================
+
+type _ = bool -> int -> int
+ 
+---
+
+(source_file
+  (type_alias
+    (identifier)
+    (type
+      (function_type
+        (type
+          (identifier))
+        (type
+          (function_type
+            (type
+              (identifier))
+            (type
+              (identifier))))))))

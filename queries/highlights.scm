@@ -27,8 +27,11 @@
   "pure"
   "action"
   "temporal"
-  ; "run"
+  "run"
 ] @property
+
+(match_expr "match" @property)
+
 
 [
   "true"

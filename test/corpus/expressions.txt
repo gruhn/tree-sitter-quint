@@ -269,22 +269,21 @@ action _ = {
           (expr
             (identifier)))))))
 
-=========================================
+========================
 If-Else Condition
-=========================================
-          
-val _ = if (p) then e1 else e2
+========================
 
+val _ = if (p) e1 else e2
 val _ = 
-  if (p) then 
+  if (p)
     e1 
-  else if (p2) then
+  else if (p2)
     e2
   else
     e3
-
+ 
 ---
-          
+
 (source_file
   (operator_definition
     (identifier)
@@ -311,8 +310,7 @@ val _ =
             (expr
               (identifier))
             (expr
-              (identifier))))))))           
-
+              (identifier))))))))
 
 ========================
 Non-Deterministic Choice
@@ -486,6 +484,45 @@ val _ = (e_1, e_2, e_3)
       (tuple_literal
         (expr
           (identifier))
+        (expr
+          (identifier))
+        (expr
+          (identifier))))))
+
+============================
+Match Expression
+============================
+
+val _ = 
+  match L_k(x) {
+    | L_1(x_1) => e_1
+    | L_2(x_2) => e_2
+    | L_3(x_3) => e_3
+  }
+
+---
+
+(source_file
+  (operator_definition
+    (identifier)
+    (expr
+      (match_expr
+        (expr
+          (operator_application
+            (identifier)
+            (expr
+              (identifier))))
+        (identifier)
+        (expr
+          (identifier))
+        (expr
+          (identifier))
+        (identifier)
+        (expr
+          (identifier))
+        (expr
+          (identifier))
+        (identifier)
         (expr
           (identifier))
         (expr

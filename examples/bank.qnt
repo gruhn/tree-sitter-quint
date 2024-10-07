@@ -5,8 +5,6 @@ module bank {
  
   pure val ADDRESSES = Set("alice", "bob", "charlie")
 
-  pure val test = _ => 42
- 
   action deposit(account, amount) = {
     // Increment balance of account by amount
     balances' = balances.setBy(account, curr => curr + amount)

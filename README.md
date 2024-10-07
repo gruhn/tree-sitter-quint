@@ -10,7 +10,7 @@ Check the `release` branch instead.
 ## Example Helix Config (for now):
 
 ```toml
-; languages.toml
+# languages.toml
 
 [[language]]
 comment-token = "//"

@@ -1,7 +1,7 @@
-# tree-sitter-quint 
+# [WIP] tree-sitter-quint 
 
-Work in progress Tree Sitter grammar for [Quint](https://quint-lang.org/).
-Mainly to get editor support in [Helix](https://helix-editor.com/).
+Tree Sitter grammar for [Quint](https://quint-lang.org/).
+Mainly with the goal to get editor support into [Helix](https://helix-editor.com/).
 
 To avoid tracking build artifacts in Git, 
 the generated parser is not included on the `master` branch.
@@ -30,3 +30,4 @@ source = { git = "https://github.com/gruhn/tree-sitter-quint.git", rev = "releas
 args = ["--stdio"]
 command = "quint-language-server"
 ```
+Also: download [helix-highlights.scm](https://github.com/gruhn/tree-sitter-quint/blob/release/queries/helix-highlights.scm) into your `<config-dir>/helix/runtime/queries/quint/highlights.scm`.

@@ -91,8 +91,6 @@ module bank {
     // TODO: add validation logic for the vesting accounts
   }
 
-  /*
-
   /// GetBalance returns the balance of a specific denomination for a given account by address.
   /// https://github.com/cosmos/cosmos-sdk/blob/06406f6a70f228bbb6d09b45a4e343477f1ef7e9/x/bank/keeper/view.go#L98
   pure def ViewKeeper::GetBalance(ctx: BankCtx, addr: Addr, denom: str): CoinResult = {
@@ -107,6 +105,7 @@ module bank {
       CoinErr("Unmarshal error")
     }
   }
+
 
   /// HasBalance returns whether or not an account has at least amt balance.\
   /// https://github.com/cosmos/cosmos-sdk/blob/06406f6a70f228bbb6d09b45a4e343477f1ef7e9/x/bank/keeper/view.go#L56
@@ -201,5 +200,4 @@ module bank {
     // Implementation: return the error ErrSendDisabled on false
     coins.forall(c => SendKeeper::IsSendEnabledCoin(ctx, c))
   }
-  */
 }

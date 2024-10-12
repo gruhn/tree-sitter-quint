@@ -147,46 +147,82 @@ Operator Applications (UFCS)
 val _ = e_1.f()
 val _ = e_1.f(e_2, e_3)
 val _ = e_1.f(e_2).g(e_3)
+val _ = e_1.e_2.f()
 
 ---
 
 (source_file
   (operator_definition
-    (qualified_identifier (identifier))
+    (qualified_identifier
+      (identifier))
     (expr
       (binary_expr
         (expr
-          (qualified_identifier (identifier)))
-        (operator_application
-          (qualified_identifier (identifier))))))
+          (qualified_identifier
+            (identifier)))
+        (expr
+          (operator_application
+            (qualified_identifier
+              (identifier)))))))
   (operator_definition
-    (qualified_identifier (identifier))
+    (qualified_identifier
+      (identifier))
     (expr
       (binary_expr
         (expr
-          (qualified_identifier (identifier)))
-        (operator_application
-          (qualified_identifier (identifier))
-          (expr
-            (qualified_identifier (identifier)))
-          (expr
-            (qualified_identifier (identifier)))))))
+          (qualified_identifier
+            (identifier)))
+        (expr
+          (operator_application
+            (qualified_identifier
+              (identifier))
+            (expr
+              (qualified_identifier
+                (identifier)))
+            (expr
+              (qualified_identifier
+                (identifier))))))))
   (operator_definition
-    (qualified_identifier (identifier))
+    (qualified_identifier
+      (identifier))
     (expr
       (binary_expr
         (expr
           (binary_expr
             (expr
-              (qualified_identifier (identifier)))
-            (operator_application
-              (qualified_identifier (identifier))
-              (expr
-                (qualified_identifier (identifier))))))
-        (operator_application
-          (qualified_identifier (identifier))
-          (expr
-            (qualified_identifier (identifier))))))))
+              (qualified_identifier
+                (identifier)))
+            (expr
+              (operator_application
+                (qualified_identifier
+                  (identifier))
+                (expr
+                  (qualified_identifier
+                    (identifier)))))))
+        (expr
+          (operator_application
+            (qualified_identifier
+              (identifier))
+            (expr
+              (qualified_identifier
+                (identifier))))))))
+  (operator_definition
+    (qualified_identifier
+      (identifier))
+    (expr
+      (binary_expr
+        (expr
+          (binary_expr
+            (expr
+              (qualified_identifier
+                (identifier)))
+            (expr
+              (qualified_identifier
+                (identifier)))))
+        (expr
+          (operator_application
+            (qualified_identifier
+              (identifier))))))))
 
 =========================================
 List Access via Index
@@ -335,20 +371,109 @@ action _ = {
 
 (source_file
   (operator_definition
-    (qualified_identifier (identifier))
+    (qualified_identifier
+      (identifier))
     (expr
       (expr
-        (nondet_choice
-          (qualified_identifier (identifier))
+        (local_operator_definition
+          (operator_definition
+            (qualified_identifier
+              (identifier))
+            (expr
+              (qualified_identifier
+                (identifier))))
           (expr
-            (qualified_identifier (identifier)))
-          (expr
-            (nondet_choice
-              (qualified_identifier (identifier))
+            (local_operator_definition
+              (operator_definition
+                (qualified_identifier
+                  (identifier))
+                (expr
+                  (qualified_identifier
+                    (identifier))))
               (expr
-                (qualified_identifier (identifier)))
+                (qualified_identifier
+                  (identifier))))))))))
+
+==========================
+Local Variable Definition
+==========================
+
+pure def ViewKeeper::ValidateBalance(ctx: BankCtx, addr: Addr): bool = and {
+  val coins = ViewKeeper::GetAllBalances(ctx, addr)
+  coins.keys().forall(denom => coins.get(denom) > 0),
+}
+ 
+---
+
+(source_file
+  (operator_definition
+    (qualified_identifier
+      (identifier)
+      (identifier))
+    (typed_argument_list
+      (identifier)
+      (type
+        (qualified_identifier
+          (identifier)))
+      (identifier)
+      (type
+        (qualified_identifier
+          (identifier))))
+    (type
+      (qualified_identifier
+        (identifier)))
+    (expr
+      (braced_and
+        (expr
+          (local_operator_definition
+            (operator_definition
+              (qualified_identifier
+                (identifier))
               (expr
-                (qualified_identifier (identifier))))))))))
+                (operator_application
+                  (qualified_identifier
+                    (identifier)
+                    (identifier))
+                  (expr
+                    (qualified_identifier
+                      (identifier)))
+                  (expr
+                    (qualified_identifier
+                      (identifier))))))
+            (expr
+              (binary_expr
+                (expr
+                  (binary_expr
+                    (expr
+                      (qualified_identifier
+                        (identifier)))
+                    (expr
+                      (operator_application
+                        (qualified_identifier
+                          (identifier))))))
+                (expr
+                  (operator_application
+                    (qualified_identifier
+                      (identifier))
+                    (expr
+                      (lambda_expr
+                        (identifier)
+                        (expr
+                          (binary_expr
+                            (expr
+                              (binary_expr
+                                (expr
+                                  (qualified_identifier
+                                    (identifier)))
+                                (expr
+                                  (operator_application
+                                    (qualified_identifier
+                                      (identifier))
+                                    (expr
+                                      (qualified_identifier
+                                        (identifier)))))))
+                            (expr
+                              (int_literal))))))))))))))))
 
 ===========================
 Map Constructor
@@ -445,12 +570,14 @@ val _ = Set((1, true), (2, false)).setToMap()
 
 (source_file
   (operator_definition
-    (qualified_identifier (identifier))
+    (qualified_identifier
+      (identifier))
     (expr
       (binary_expr
         (expr
           (operator_application
-            (qualified_identifier (identifier))
+            (qualified_identifier
+              (identifier))
             (expr
               (tuple_literal
                 (expr
@@ -463,8 +590,11 @@ val _ = Set((1, true), (2, false)).setToMap()
                   (int_literal))
                 (expr
                   (bool_literal))))))
-        (operator_application
-          (qualified_identifier (identifier)))))))
+        (expr
+          (operator_application
+            (qualified_identifier
+              (identifier))))))))
+
 
 ============================
 Tuple Constructor
@@ -568,5 +698,3 @@ val _ = [e_1, e_2, e_3]
           (qualified_identifier (identifier)))
         (expr
           (qualified_identifier (identifier)))))))
-
-

@@ -87,21 +87,25 @@ pure val Nodes: Set[int] = 1.to(10)
 
 (source_file
   (operator_definition
-    (qualified_identifier (identifier))
+    (qualified_identifier
+      (identifier))
     (type
       (polymorphic_type
-        (qualified_identifier (identifier))
+        (qualified_identifier
+          (identifier))
         (type
-          (qualified_identifier (identifier)))))
+          (qualified_identifier
+            (identifier)))))
     (expr
       (binary_expr
         (expr
           (int_literal))
-        (operator_application
-          (qualified_identifier (identifier))
-          (expr
-            (int_literal)))))))
-
+        (expr
+          (operator_application
+            (qualified_identifier
+              (identifier))
+            (expr
+              (int_literal))))))))
 
 ==========================================
 Definition with Optional Ending Semicolon
@@ -333,24 +337,55 @@ type INT_SET = Set[int]
 Sum Type
 ========================
 
-type Elem = S(str) | I(int) | Nil
+type _ = S(str) | I(int) | Nil
+
+type _ = 
+  | S(str) // <-- optional leading pipe
+  | I(int) 
+  | Nil
  
 ---
 
 (source_file
   (type_alias
-    (qualified_identifier (identifier))
+    (qualified_identifier
+      (identifier))
     (sum_type
       (variant_constructor
-        (qualified_identifier (identifier))
+        (qualified_identifier
+          (identifier))
         (type
-          (qualified_identifier (identifier))))
+          (qualified_identifier
+            (identifier))))
       (variant_constructor
-        (qualified_identifier (identifier))
+        (qualified_identifier
+          (identifier))
         (type
-          (qualified_identifier (identifier))))
+          (qualified_identifier
+            (identifier))))
       (variant_constructor
-        (qualified_identifier (identifier))))))
+        (qualified_identifier
+          (identifier)))))
+  (type_alias
+    (qualified_identifier
+      (identifier))
+    (sum_type
+      (variant_constructor
+        (qualified_identifier
+          (identifier))
+        (type
+          (qualified_identifier
+            (identifier))))
+      (comment)
+      (variant_constructor
+        (qualified_identifier
+          (identifier))
+        (type
+          (qualified_identifier
+            (identifier))))
+      (variant_constructor
+        (qualified_identifier
+          (identifier))))))
 
 ========================
 Operator Type

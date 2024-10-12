@@ -106,7 +106,10 @@ module.exports = grammar({
     // We say sum types must have at least two variant constructor.
     // One variant constructor makes sense, but can't be distingished
     // with a basic type like `int`.
-    sum_type: $ => sepBy1('|', $.variant_constructor),
+    sum_type: $ => seq(
+      optional('|'), // optional leading pipe
+      sepBy1('|', $.variant_constructor)
+    ),
 
     record_type: $ => withBraces(
       sepEndBy1(',', seq(
@@ -161,6 +164,7 @@ module.exports = grammar({
         ),
         'action', 
         'temporal',
+        'nondet',
         'run'
       ),
 
@@ -175,7 +179,7 @@ module.exports = grammar({
 
       '=', 
       field('rhs', $.expr), 
-      optional(';')
+      choice(';', '\n')
     ),
 
     // TODO: https://quint-lang.org/docs/lang#module-instances
@@ -217,7 +221,7 @@ module.exports = grammar({
       $.braced_all,      
       $.string,
       $.if_else_condition,
-      $.nondet_choice,
+      $.local_operator_definition,
       $.record_literal,
       $.tuple_literal,
       $.list_literal,
@@ -273,7 +277,7 @@ module.exports = grammar({
     // TODO: what about `1 to 10`-like infix operator?
     // @see https://quint-lang.org/docs/lang#two-forms-of-operator-application
     binary_expr: $ => choice(
-      prec.left ('ufcs_app'      , seq($.expr, '.'      , $.operator_application)),
+      prec.left ('ufcs'          , seq($.expr, '.'      , $.expr)),
       prec.right('integer_exp'   , seq($.expr, '^'      , $.expr)),
       prec.left ('integer_mult'  , seq($.expr, '*'      , $.expr)),
       prec.left ('integer_mult'  , seq($.expr, '/'      , $.expr)),
@@ -306,9 +310,7 @@ module.exports = grammar({
 
     if_else_condition: $ => prec('if_else', seq('if', withParens($.expr), $.expr, 'else', $.expr)),
 
-    nondet_choice: $ => prec.right('nondet_choice', seq(
-      'nondet', $.qualified_identifier, '=', $.expr, choice(';', '\n'), $.expr
-    )),
+    local_operator_definition: $ => prec.right('local_def', seq($.operator_definition, $.expr)),
 
     record_literal: $ => withBraces(
       sepBy1(
@@ -342,7 +344,7 @@ module.exports = grammar({
 
   precedences: $ => [
     [
-      'ufcs_app',
+      'ufcs',
       'list_access',
       'integer_neg',
       'integer_exp',
@@ -359,7 +361,7 @@ module.exports = grammar({
       'pair',
       'braced_all',
       'braced_any',
-      'nondet_choice', // TODO: docs don't specify precedence
+      'local_def',
       'if_else', // TODO: docs don't specify precedence
     ],
     [

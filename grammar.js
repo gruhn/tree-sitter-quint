@@ -333,7 +333,7 @@ module.exports = grammar({
     tuple_literal: $ => prec('tuple', withParens(sepBy(',', $.expr))),
 
     match_expr: $ => seq('match', $.expr, withBraces(
-      repeat(seq('|', $.qualified_identifier, withParens($.expr), '=>', $.expr))
+      repeat(seq('|', $.qualified_identifier, optional(withParens($.expr)), '=>', $.expr))
     )),
 
     list_literal: $ => withBrackets(sepBy(',', $.expr)),

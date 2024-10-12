@@ -636,36 +636,45 @@ val _ =
   match L_k(x) {
     | L_1(x_1) => e_1
     | L_2(x_2) => e_2
-    | L_3(x_3) => e_3
+    | L_3      => e_3
   }
 
 ---
 
 (source_file
   (operator_definition
-    (qualified_identifier (identifier))
+    (qualified_identifier
+      (identifier))
     (expr
       (match_expr
         (expr
           (operator_application
-            (qualified_identifier (identifier))
+            (qualified_identifier
+              (identifier))
             (expr
-              (qualified_identifier (identifier)))))
-        (qualified_identifier (identifier))
+              (qualified_identifier
+                (identifier)))))
+        (qualified_identifier
+          (identifier))
         (expr
-          (qualified_identifier (identifier)))
+          (qualified_identifier
+            (identifier)))
         (expr
-          (qualified_identifier (identifier)))
-        (qualified_identifier (identifier))
+          (qualified_identifier
+            (identifier)))
+        (qualified_identifier
+          (identifier))
         (expr
-          (qualified_identifier (identifier)))
+          (qualified_identifier
+            (identifier)))
         (expr
-          (qualified_identifier (identifier)))
-        (qualified_identifier (identifier))
+          (qualified_identifier
+            (identifier)))
+        (qualified_identifier
+          (identifier))
         (expr
-          (qualified_identifier (identifier)))
-        (expr
-          (qualified_identifier (identifier)))))))
+          (qualified_identifier
+            (identifier)))))))
 
 ============================
 List Constructor

@@ -28,6 +28,9 @@ module.exports = grammar({
     identifier: $ => /[a-zA-Z_]([a-zA-Z0-9_])*/,
     // identifier_in_caps: $ => /[A-Z_]([A-Z0-9_])*/,
 
+    // TODO: are there places where only non-qualified identifieres are allowed?
+    qualified_identifier: $ => seq(optional(seq($.identifier, '::')), $.identifier),
+
     unescaped_double_string_fragment: _ => token.immediate(prec(1, /[^"\\\r\n]+/)),
 
     // QUESTION: correct escape syntax?
@@ -69,10 +72,12 @@ module.exports = grammar({
 
     // TODO: all types covered?
     type: $ => choice(
-      prec('basic_type', $.identifier), // basic type
+      prec('basic_type', $.qualified_identifier), // basic type
       $.operator_type,
       $.function_type,
       $.polymorphic_type,
+      $.record_type,
+      $.tuple_type,
     ),
 
     // QUESTION: function types always have exaclty one argument?
@@ -88,13 +93,13 @@ module.exports = grammar({
     )),
 
     polymorphic_type: $ => seq(
-      $.identifier, 
+      $.qualified_identifier, 
       withBrackets(sepBy1(',', $.type))
     ),
 
     // TODO: can variant constructors have more than one argument?
     variant_constructor: $ => prec('variant_constr', seq(
-      $.identifier, 
+      $.qualified_identifier, 
       optional(withParens($.type))
     )),
 
@@ -103,10 +108,18 @@ module.exports = grammar({
     // with a basic type like `int`.
     sum_type: $ => sepBy1('|', $.variant_constructor),
 
+    record_type: $ => withBraces(
+      sepEndBy1(',', seq(
+        seq($.qualified_identifier, ':', $.type),
+      ))
+    ),
+
+    tuple_type: $ => prec('tuple_type', withParens(sepBy(',', $.type))),
+
     /////////// Module-level constructs ///////////
     
     module_definition: $ => seq(
-      'module', $.identifier, '{',
+      'module', $.qualified_identifier, '{',
         repeat(choice(
           $.constant_declaration,
           $.assumption,
@@ -118,15 +131,15 @@ module.exports = grammar({
     ),
 
     constant_declaration: $ => seq(
-      'const', $.identifier, ':', $.type
+      'const', $.qualified_identifier, ':', $.type
     ),
 
     assumption: $ => seq(
-      'assume', $.identifier, '=', $.expr
+      'assume', $.qualified_identifier, '=', $.expr
     ),
 
     variable_definition: $ => seq(
-      'var', $.identifier, ':', $.type
+      'var', $.qualified_identifier, ':', $.type
     ),
 
     typed_argument_list: $ => withParens(
@@ -152,7 +165,7 @@ module.exports = grammar({
       ),
 
       // operator name:
-      field('name', $.identifier),
+      field('name', $.qualified_identifier),
 
       // argument list:
       field('arguments', optional($.typed_argument_list)),
@@ -170,7 +183,7 @@ module.exports = grammar({
     // TODO: type alias identifier must be all CAPS
     type_alias: $ => seq(
       'type', 
-      $.identifier, 
+      $.qualified_identifier, 
       optional(withBrackets(sepBy1(',', $.identifier))), // optional type arguments
       '=', 
       choice(
@@ -192,7 +205,7 @@ module.exports = grammar({
       $.bool_literal,
       $.int_literal,
       $.well_known_set,
-      $.identifier,
+      $.qualified_identifier,
       $.lambda_expr,
       $.operator_application,
       $.unary_expr,
@@ -247,7 +260,7 @@ module.exports = grammar({
     )),
 
     operator_application: $ => seq(
-      field('operator', $.identifier),
+      field('operator', $.qualified_identifier),
       field('arguments', withParens(sepBy(',', $.expr))),
     ),
 
@@ -294,15 +307,15 @@ module.exports = grammar({
     if_else_condition: $ => prec('if_else', seq('if', withParens($.expr), $.expr, 'else', $.expr)),
 
     nondet_choice: $ => prec.right('nondet_choice', seq(
-      'nondet', $.identifier, '=', $.expr, choice(';', '\n'), $.expr
+      'nondet', $.qualified_identifier, '=', $.expr, choice(';', '\n'), $.expr
     )),
 
     record_literal: $ => withBraces(
       sepBy1(
         ',',
         choice(
-          seq($.identifier, ':', $.expr),
-          seq('...', $.identifier) // record spread
+          seq($.qualified_identifier, ':', $.expr),
+          seq('...', $.qualified_identifier) // record spread
         )
       )
     ),
@@ -310,7 +323,7 @@ module.exports = grammar({
     tuple_literal: $ => prec('tuple', withParens(sepBy(',', $.expr))),
 
     match_expr: $ => seq('match', $.expr, withBraces(
-      repeat(seq('|', $.identifier, withParens($.expr), '=>', $.expr))
+      repeat(seq('|', $.qualified_identifier, withParens($.expr), '=>', $.expr))
     )),
 
     list_literal: $ => withBrackets(sepBy(',', $.expr)),
@@ -357,6 +370,7 @@ module.exports = grammar({
       'function_type',
       'operator_type',
       'variant_constr',
+      'tuple_type',
       'basic_type',
     ]
   ],
@@ -438,4 +452,3 @@ function withBraces(rule) {
 function withBrackets(rule) {
   return seq('[', rule, ']')
 }
-

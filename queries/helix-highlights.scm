@@ -101,11 +101,11 @@
 (string) @string
 
 (operator_application
-  operator: (identifier) @function)
+  operator: (qualified_identifier) @function)
 
 ; operator definition is a function if it has at least one argument ...
 (operator_definition
-  name: (identifier) @function
+  name: (qualified_identifier) @function
   arguments: (typed_argument_list))
 ; ... or if the right-hand-side is a lambda expression: 
 ; (operator_definition

@@ -8,7 +8,6 @@ module.exports = grammar({
     // TODO: what top-level constructs are allowed?
     source_file: $ => repeat(
       choice(
-        $.string,
         $.module_definition,
 
         // Technically, these are not valid top-level statements
@@ -20,6 +19,8 @@ module.exports = grammar({
         $.variable_definition,
         $.operator_definition,
         $.type_alias,
+        $.string,
+        $.import
       )
     ),
 
@@ -129,6 +130,7 @@ module.exports = grammar({
           $.variable_definition,
           $.operator_definition,
           $.type_alias,
+          $.import,
         )),
       '}',
     ),
@@ -196,7 +198,13 @@ module.exports = grammar({
       )
     ),
 
-    /////////// Namespaces and Imports  ///////////
+    import: $ => seq(
+      'import', 
+      sepBy1('.', choice($.qualified_identifier, '*')),
+      optional( // when imported from another file
+        seq('from', $.string)
+      )    
+    ),
 
     // TODO https://quint-lang.org/docs/lang#namespaces-and-imports
 

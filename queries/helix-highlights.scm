@@ -34,10 +34,10 @@
 ;   ; "not"
 ; ] @keyword.operator
 
-; [
-;   "import"
-;   "export"
-; ] @keyword.control.import
+(import
+  "import" @keyword.control.import
+  "from" @keyword.control.import
+)
 
 [
   "true"

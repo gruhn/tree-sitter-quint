@@ -535,3 +535,35 @@ def Foo::bar = _
     (expr
       (qualified_identifier
         (identifier)))))
+
+========================
+Imports
+========================
+
+module Foo {
+  import Foo.bar.baz
+  import Math.*
+  import bank.* from "./bank"
+}
+
+---
+
+(source_file
+  (module_definition
+    (qualified_identifier
+      (identifier))
+    (import
+      (qualified_identifier
+        (identifier))
+      (qualified_identifier
+        (identifier))
+      (qualified_identifier
+        (identifier)))
+    (import
+      (qualified_identifier
+        (identifier)))
+    (import
+      (qualified_identifier
+        (identifier))
+      (string
+        (string_fragment)))))

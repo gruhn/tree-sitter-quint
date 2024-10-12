@@ -3,8 +3,6 @@
 
 [
   "module"
-  ; "from"
-  ; "as"
   "type"
   "assume"
   "const"
@@ -34,10 +32,11 @@
 ;   ; "not"
 ; ] @keyword.operator
 
-(import
-  "import" @keyword.control.import
-  "from" @keyword.control.import
-)
+(import "import" @keyword.control.import)
+(import "as" @keyword.control.import)
+(import "from" @keyword.control.import)
+(export "export" @keyword.control.import)
+(export "as" @keyword.control.import)
 
 [
   "true"

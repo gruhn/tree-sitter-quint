@@ -4,14 +4,24 @@ if [ ! -d "examples" ]; then
   exit 1
 fi
 
-# Stop if one of the parse commands returns with 
-# non-zero exit code:
-set -e
+# Set exit code to 1 if parsing fails for any of the 
+# example files:
+exit_code=0
 
 # Run parser on every example:
+echo "Parsing all files in example directory: "
 for file in examples/*.qnt; do
   if [ -f "$file" ]; then
     # Will return exit code 1, if parsing fails:
-    tree-sitter parse --quiet "$file"
+    tree-sitter parse --quiet "$file" > /dev/null
+
+    if [ "$?" -eq "0" ]; then
+      echo "success: $file"
+    else
+      echo "failed: $file"
+      exit_code=1
+    fi
   fi
 done
+
+exit $exit_code

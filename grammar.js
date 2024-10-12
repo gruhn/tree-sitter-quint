@@ -20,7 +20,8 @@ module.exports = grammar({
         $.operator_definition,
         $.type_alias,
         $.string,
-        $.import
+        $.import,
+        $.export
       )
     ),
 
@@ -30,7 +31,10 @@ module.exports = grammar({
     // identifier_in_caps: $ => /[A-Z_]([A-Z0-9_])*/,
 
     // TODO: are there places where only non-qualified identifieres are allowed?
-    qualified_identifier: $ => seq(optional(seq($.identifier, '::')), $.identifier),
+    qualified_identifier: $ => seq(
+      repeat(seq($.identifier, '::')),
+      $.identifier
+    ),
 
     unescaped_double_string_fragment: _ => token.immediate(prec(1, /[^"\\\r\n]+/)),
 
@@ -131,6 +135,7 @@ module.exports = grammar({
           $.operator_definition,
           $.type_alias,
           $.import,
+          $.export,
         )),
       '}',
     ),
@@ -201,12 +206,21 @@ module.exports = grammar({
     import: $ => seq(
       'import', 
       sepBy1('.', choice($.qualified_identifier, '*')),
+      optional(
+        seq('as', $.qualified_identifier)
+      ),
       optional( // when imported from another file
         seq('from', $.string)
       )    
     ),
 
-    // TODO https://quint-lang.org/docs/lang#namespaces-and-imports
+    export: $ => seq(
+      'export', 
+      sepBy1('.', choice($.qualified_identifier, '*')),
+      optional(
+        seq('as', $.qualified_identifier)
+      ),
+    ),
 
     /////////// Expressions ///////////
 

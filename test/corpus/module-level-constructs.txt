@@ -523,7 +523,7 @@ type _ = (int, str)
 Qualified Identifier
 ========================
 
-def Foo::bar = _
+def Foo::bar = Foo::Bar::baz
 
 ---
 
@@ -534,16 +534,19 @@ def Foo::bar = _
       (identifier))
     (expr
       (qualified_identifier
+        (identifier)
+        (identifier)
         (identifier)))))
 
 ========================
 Imports
 ========================
 
-module Foo {
+module _ {
   import Foo.bar.baz
   import Math.*
   import bank.* from "./bank"
+  import Foo as MyFoo
 }
 
 ---
@@ -566,4 +569,38 @@ module Foo {
       (qualified_identifier
         (identifier))
       (string
-        (string_fragment)))))
+        (string_fragment)))
+    (import
+      (qualified_identifier
+        (identifier))
+      (qualified_identifier
+        (identifier)))))
+
+========================
+Exports
+========================
+
+module _ {
+  export Math.*
+  export Foo
+  export Foo as MyFoo
+}
+
+---
+
+(source_file
+  (module_definition
+    (qualified_identifier
+      (identifier))
+    (export
+      (qualified_identifier
+        (identifier)))
+    (export
+      (qualified_identifier
+        (identifier)))
+    (export
+      (qualified_identifier
+        (identifier))
+      (qualified_identifier
+        (identifier)))))
+

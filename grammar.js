@@ -299,7 +299,7 @@ module.exports = grammar({
     // TODO: what about `1 to 10`-like infix operator?
     // @see https://quint-lang.org/docs/lang#two-forms-of-operator-application
     binary_expr: $ => choice(
-      prec.left ('ufcs'          , seq($.expr, '.'      , $.expr)),
+      prec.left ('ufcs'          , seq($.expr, '.'      , choice($.qualified_identifier, $.operator_application))),
       prec.right('integer_exp'   , seq($.expr, '^'      , $.expr)),
       prec.left ('integer_mult'  , seq($.expr, '*'      , $.expr)),
       prec.left ('integer_mult'  , seq($.expr, '/'      , $.expr)),
@@ -361,8 +361,7 @@ module.exports = grammar({
     /\s/, // whitespace
   ],
 
-  // conflicts: $ => [
-  // ],
+  // conflicts: $ => [ ],
 
   precedences: $ => [
     [

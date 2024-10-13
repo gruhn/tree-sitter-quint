@@ -9,7 +9,7 @@ fi
 exit_code=0
 
 # Run parser on every example:
-echo "Parsing all files in example directory: "
+echo "Trying to parse all example Quint files: "
 for file in examples/*.qnt; do
   if [ -f "$file" ]; then
     # Will return exit code 1, if parsing fails:

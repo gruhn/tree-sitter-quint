@@ -274,7 +274,7 @@ module.exports = grammar({
     },
 
 
-    lambda_expr: $ => prec.right(1, seq(
+    lambda_expr: $ => prec.right('lambda', seq(
       choice(
         $.identifier,
         // TODO: can lambdas args have type annotations?
@@ -384,10 +384,11 @@ module.exports = grammar({
       'braced_any',
       'local_def',
       'if_else', // TODO: docs don't specify precedence
+      'lambda',
     ],
     [
-      'tuple',
       'parens',
+      'tuple',
     ],
     [
       'function_type',

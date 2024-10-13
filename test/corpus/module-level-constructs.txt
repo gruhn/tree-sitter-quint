@@ -21,6 +21,7 @@ const N: int
 const Proc: Set[str]
 
 ---
+
 (source_file
   (constant_declaration
     (qualified_identifier (identifier))

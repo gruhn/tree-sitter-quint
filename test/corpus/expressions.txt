@@ -285,6 +285,17 @@ action _ = all {
                   (identifier))))))))))
 
 =========================================
+UFCS Application - Multi Line
+=========================================
+
+def _ = list
+  .filter(f)
+  .map(g)
+
+---
+
+
+=========================================
 List Access via Index
 =========================================
           
@@ -454,9 +465,9 @@ action _ = {
                 (qualified_identifier
                   (identifier))))))))))
 
-==========================
-Local Variable Definition
-==========================
+============================
+Local Variable Definition 1
+============================
 
 def _ = and {
   val coins = GetAllBalances(addr)
@@ -501,6 +512,16 @@ def _ = and {
                               (identifier)))
                           (expr
                             (int_literal)))))))))))))))
+
+============================
+Local Variable Definition 2
+============================
+
+def _ = val test = foo.bar() 42
+def _ = val test = foo.bar () 
+
+---
+
 
 ===========================
 Map Constructor
@@ -626,32 +647,39 @@ Tuple Constructor
 ============================
 
 val _ = ()
-val _ = (e_1)
+val _ = (e_1) // <-- not a tuple
 val _ = (e_1, e_2, e_3)
 
 ---
 
 (source_file
   (operator_definition
-    (qualified_identifier (identifier))
+    (qualified_identifier
+      (identifier))
     (expr
       (tuple_literal)))
   (operator_definition
-    (qualified_identifier (identifier))
+    (qualified_identifier
+      (identifier))
     (expr
-      (tuple_literal
-        (expr
-          (qualified_identifier (identifier))))))
+      (expr
+        (qualified_identifier
+          (identifier))))
+    (comment))
   (operator_definition
-    (qualified_identifier (identifier))
+    (qualified_identifier
+      (identifier))
     (expr
       (tuple_literal
         (expr
-          (qualified_identifier (identifier)))
+          (qualified_identifier
+            (identifier)))
         (expr
-          (qualified_identifier (identifier)))
+          (qualified_identifier
+            (identifier)))
         (expr
-          (qualified_identifier (identifier)))))))
+          (qualified_identifier
+            (identifier)))))))
 
 ============================
 Match Expression

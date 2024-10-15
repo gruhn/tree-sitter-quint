@@ -17,4 +17,5 @@ package-lock.json
 build/
 *.dylib
 *.dylib.dSYM
+*.so
 *.so.dSYM

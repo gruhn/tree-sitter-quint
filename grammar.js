@@ -349,7 +349,7 @@ module.exports = grammar({
     local_operator_definition: $ => prec.right('local_def', seq($.operator_definition, $.expr)),
 
     record_literal: $ => withBraces(
-      sepBy1(
+      sepEndBy1(
         ',',
         choice(
           seq($.qualified_identifier, ':', $.expr),

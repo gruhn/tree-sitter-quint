@@ -734,24 +734,56 @@ val _ = Map(k_1 -> v_1, k_2 -> v_2, k_3 -> v_3)
 Record Constructor
 ============================
 
-val _ = { f_1: e_1, f_2: e_2, f_3: e_3 }
+val _ = { 
+  f_1: e_1, 
+  f_2: e_2, 
+  f_3: e_3 
+}
+
+val _ = { 
+  f_1: e_1, 
+  f_2: e_2, // <-- optional comma
+}
 
 ---
 
 (source_file
   (operator_definition
-    (qualified_identifier (identifier))
+    (qualified_identifier
+      (identifier))
     (expr
       (record_literal
-        (qualified_identifier (identifier))
+        (qualified_identifier
+          (identifier))
         (expr
-          (qualified_identifier (identifier)))
-        (qualified_identifier (identifier))
+          (qualified_identifier
+            (identifier)))
+        (qualified_identifier
+          (identifier))
         (expr
-          (qualified_identifier (identifier)))
-        (qualified_identifier (identifier))
+          (qualified_identifier
+            (identifier)))
+        (qualified_identifier
+          (identifier))
         (expr
-          (qualified_identifier (identifier)))))))
+          (qualified_identifier
+            (identifier))))))
+  (operator_definition
+    (qualified_identifier
+      (identifier))
+    (expr
+      (record_literal
+        (qualified_identifier
+          (identifier))
+        (expr
+          (qualified_identifier
+            (identifier)))
+        (qualified_identifier
+          (identifier))
+        (expr
+          (qualified_identifier
+            (identifier)))
+        (comment)))))
 
 ============================
 Record Spread

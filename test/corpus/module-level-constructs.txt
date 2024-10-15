@@ -101,11 +101,12 @@ pure val Nodes: Set[int] = 1.to(10)
       (binary_expr
         (expr
           (int_literal))
-        (operator_application
-          (qualified_identifier
-            (identifier))
-          (expr
-            (int_literal)))))))
+        (ufcs_right_hand_side
+          (operator_application
+            (qualified_identifier
+              (identifier))
+            (expr
+              (int_literal))))))))
 
 ==========================================
 Definition with Optional Ending Semicolon

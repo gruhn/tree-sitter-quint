@@ -186,7 +186,7 @@ module.exports = grammar({
 
       '=', 
       field('rhs', $.expr), 
-      choice(';', '\n')
+      optional(';'),
     ),
 
     // TODO: https://quint-lang.org/docs/lang#module-instances
@@ -308,10 +308,12 @@ module.exports = grammar({
       prec('integer_neg', seq('-', $.expr)),     
     ),
 
+    ufcs_right_hand_side: $ => choice($.qualified_identifier, $.operator_application),
+
     // TODO: what about `1 to 10`-like infix operator?
     // @see https://quint-lang.org/docs/lang#two-forms-of-operator-application
     binary_expr: $ => choice(
-      prec.left ('ufcs'          , seq($.expr, '.'      , choice($.qualified_identifier, $.operator_application))),
+      prec.left ('ufcs'          , seq($.expr, '.'      , $.ufcs_right_hand_side)),
       prec.right('integer_exp'   , seq($.expr, '^'      , $.expr)),
       prec.left ('integer_mult'  , seq($.expr, '*'      , $.expr)),
       prec.left ('integer_mult'  , seq($.expr, '/'      , $.expr)),
@@ -363,17 +365,31 @@ module.exports = grammar({
     )),
 
     list_literal: $ => withBrackets(sepBy(',', $.expr)),
-
-    // TODO: nested operator definitions
-
   },
 
   extras: $ => [
     $.comment,
-    /\s/, // whitespace
+    /[\s]/, // whitespace
   ],
 
-  // conflicts: $ => [ ],
+  conflicts: $ => [
+    // Can't disambguate the following situation without
+    // more lookahead:
+    //
+    //             local definition
+    //                vvvvvvvvv
+    //      val foo = val bar = func (42) ...
+    //                          ^^^^^^^^^
+    //         function application or value to outer assignment?
+    //
+    [$.expr, $.operator_application],
+
+    [$.ufcs_right_hand_side, $.operator_application],
+    [$.operator_definition, $.list_access],
+    [$.operator_definition, $.binary_expr],
+    [$.operator_definition, $.infix_or],
+    [$.operator_definition, $.infix_and],
+  ],
 
   precedences: $ => [
     [

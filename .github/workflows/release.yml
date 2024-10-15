@@ -28,6 +28,8 @@ jobs:
           mv release.gitignore .gitignore
       - name: Set up tree-sitter CLI
         uses: tree-sitter/setup-action/cli@v1
+        with:
+          tree-sitter-ref: 'v0.22.6'
       - name: Install parser dependencies
         run: |-
           JQ_SCRIPT='.dependencies | del(."node-addon-api", ."node-gyp-build") | length > 0'

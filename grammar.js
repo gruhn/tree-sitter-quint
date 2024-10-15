@@ -8,7 +8,6 @@ module.exports = grammar({
     // TODO: what top-level constructs are allowed?
     source_file: $ => repeat(
       choice(
-        $.string,
         $.module_definition,
 
         // Technically, these are not valid top-level statements
@@ -20,6 +19,9 @@ module.exports = grammar({
         $.variable_definition,
         $.operator_definition,
         $.type_alias,
+        $.string,
+        $.import,
+        $.export
       )
     ),
 
@@ -27,6 +29,12 @@ module.exports = grammar({
 
     identifier: $ => /[a-zA-Z_]([a-zA-Z0-9_])*/,
     // identifier_in_caps: $ => /[A-Z_]([A-Z0-9_])*/,
+
+    // TODO: are there places where only non-qualified identifieres are allowed?
+    qualified_identifier: $ => seq(
+      repeat(seq($.identifier, '::')),
+      $.identifier
+    ),
 
     unescaped_double_string_fragment: _ => token.immediate(prec(1, /[^"\\\r\n]+/)),
 
@@ -69,10 +77,12 @@ module.exports = grammar({
 
     // TODO: all types covered?
     type: $ => choice(
-      prec('basic_type', $.identifier), // basic type
+      prec('basic_type', $.qualified_identifier), // basic type
       $.operator_type,
       $.function_type,
       $.polymorphic_type,
+      $.record_type,
+      $.tuple_type,
     ),
 
     // QUESTION: function types always have exaclty one argument?
@@ -88,45 +98,58 @@ module.exports = grammar({
     )),
 
     polymorphic_type: $ => seq(
-      $.identifier, 
+      $.qualified_identifier, 
       withBrackets(sepBy1(',', $.type))
     ),
 
     // TODO: can variant constructors have more than one argument?
     variant_constructor: $ => prec('variant_constr', seq(
-      $.identifier, 
+      $.qualified_identifier, 
       optional(withParens($.type))
     )),
 
     // We say sum types must have at least two variant constructor.
     // One variant constructor makes sense, but can't be distingished
     // with a basic type like `int`.
-    sum_type: $ => sepBy1('|', $.variant_constructor),
+    sum_type: $ => seq(
+      optional('|'), // optional leading pipe
+      sepBy1('|', $.variant_constructor)
+    ),
+
+    record_type: $ => withBraces(
+      sepEndBy(',', seq(
+        seq($.qualified_identifier, ':', $.type),
+      ))
+    ),
+
+    tuple_type: $ => prec('tuple_type', withParens(sepBy(',', $.type))),
 
     /////////// Module-level constructs ///////////
     
     module_definition: $ => seq(
-      'module', $.identifier, '{',
+      'module', $.qualified_identifier, '{',
         repeat(choice(
           $.constant_declaration,
           $.assumption,
           $.variable_definition,
           $.operator_definition,
           $.type_alias,
+          $.import,
+          $.export,
         )),
       '}',
     ),
 
     constant_declaration: $ => seq(
-      'const', $.identifier, ':', $.type
+      'const', $.qualified_identifier, ':', $.type
     ),
 
     assumption: $ => seq(
-      'assume', $.identifier, '=', $.expr
+      'assume', $.qualified_identifier, '=', $.expr
     ),
 
     variable_definition: $ => seq(
-      'var', $.identifier, ':', $.type
+      'var', $.qualified_identifier, ':', $.type
     ),
 
     typed_argument_list: $ => withParens(
@@ -148,11 +171,12 @@ module.exports = grammar({
         ),
         'action', 
         'temporal',
+        'nondet',
         'run'
       ),
 
       // operator name:
-      field('name', $.identifier),
+      field('name', $.qualified_identifier),
 
       // argument list:
       field('arguments', optional($.typed_argument_list)),
@@ -162,7 +186,7 @@ module.exports = grammar({
 
       '=', 
       field('rhs', $.expr), 
-      optional(';')
+      optional(';'),
     ),
 
     // TODO: https://quint-lang.org/docs/lang#module-instances
@@ -170,7 +194,7 @@ module.exports = grammar({
     // TODO: type alias identifier must be all CAPS
     type_alias: $ => seq(
       'type', 
-      $.identifier, 
+      $.qualified_identifier, 
       optional(withBrackets(sepBy1(',', $.identifier))), // optional type arguments
       '=', 
       choice(
@@ -179,9 +203,36 @@ module.exports = grammar({
       )
     ),
 
-    /////////// Namespaces and Imports  ///////////
+    import: $ => seq(
+      'import', 
+      sepBy1('.', $.import_segment),
+      optional(
+        seq('as', $.qualified_identifier)
+      ),
+      optional( // when imported from another file
+        seq('from', $.string)
+      )    
+    ),
 
-    // TODO https://quint-lang.org/docs/lang#namespaces-and-imports
+    import_segment_arguments: $ => withParens(
+      sepBy(',', seq($.qualified_identifier, '=', $.expr))
+    ),
+
+    import_segment: $ => choice(
+      '*',
+      seq(
+        $.qualified_identifier, 
+        optional($.import_segment_arguments)
+      ),
+    ),
+
+    export: $ => seq(
+      'export', 
+      sepBy1('.', choice($.qualified_identifier, '*')),
+      optional(
+        seq('as', $.qualified_identifier)
+      ),
+    ),
 
     /////////// Expressions ///////////
 
@@ -192,7 +243,7 @@ module.exports = grammar({
       $.bool_literal,
       $.int_literal,
       $.well_known_set,
-      $.identifier,
+      $.qualified_identifier,
       $.lambda_expr,
       $.operator_application,
       $.unary_expr,
@@ -204,7 +255,7 @@ module.exports = grammar({
       $.braced_all,      
       $.string,
       $.if_else_condition,
-      $.nondet_choice,
+      $.local_operator_definition,
       $.record_literal,
       $.tuple_literal,
       $.list_literal,
@@ -235,7 +286,7 @@ module.exports = grammar({
     },
 
 
-    lambda_expr: $ => prec.right(1, seq(
+    lambda_expr: $ => prec.right('lambda', seq(
       choice(
         $.identifier,
         // TODO: can lambdas args have type annotations?
@@ -247,7 +298,7 @@ module.exports = grammar({
     )),
 
     operator_application: $ => seq(
-      field('operator', $.identifier),
+      field('operator', $.qualified_identifier),
       field('arguments', withParens(sepBy(',', $.expr))),
     ),
 
@@ -257,10 +308,12 @@ module.exports = grammar({
       prec('integer_neg', seq('-', $.expr)),     
     ),
 
+    ufcs_right_hand_side: $ => choice($.qualified_identifier, $.operator_application),
+
     // TODO: what about `1 to 10`-like infix operator?
     // @see https://quint-lang.org/docs/lang#two-forms-of-operator-application
     binary_expr: $ => choice(
-      prec.left ('ufcs_app'      , seq($.expr, '.'      , $.operator_application)),
+      prec.left ('ufcs'          , seq($.expr, '.'      , $.ufcs_right_hand_side)),
       prec.right('integer_exp'   , seq($.expr, '^'      , $.expr)),
       prec.left ('integer_mult'  , seq($.expr, '*'      , $.expr)),
       prec.left ('integer_mult'  , seq($.expr, '/'      , $.expr)),
@@ -277,7 +330,7 @@ module.exports = grammar({
       $.infix_or,
       $.infix_iff,
       $.infix_implies,
-      prec.left ('delayed_assign', seq($.expr, '\' ='   , $.expr)),
+      prec.left ('delayed_assign', seq($.expr, '\'', '=', $.expr)),
       prec.left ('pair'          , seq($.expr, '->'     , $.expr)),
     ),
 
@@ -293,43 +346,59 @@ module.exports = grammar({
 
     if_else_condition: $ => prec('if_else', seq('if', withParens($.expr), $.expr, 'else', $.expr)),
 
-    nondet_choice: $ => prec.right('nondet_choice', seq(
-      'nondet', $.identifier, '=', $.expr, choice(';', '\n'), $.expr
-    )),
+    local_operator_definition: $ => prec.right('local_def', seq($.operator_definition, $.expr)),
 
     record_literal: $ => withBraces(
-      sepBy1(
+      sepEndBy1(
         ',',
         choice(
-          seq($.identifier, ':', $.expr),
-          seq('...', $.identifier) // record spread
+          seq($.qualified_identifier, ':', $.expr),
+          seq('...', $.qualified_identifier) // record spread
         )
       )
     ),
 
     tuple_literal: $ => prec('tuple', withParens(sepBy(',', $.expr))),
 
-    match_expr: $ => seq('match', $.expr, withBraces(
-      repeat(seq('|', $.identifier, withParens($.expr), '=>', $.expr))
-    )),
+    match_case: $ => seq(
+      $.qualified_identifier, 
+      optional(withParens($.expr)), 
+      '=>', 
+      $.expr
+    ),
+
+    match_expr: $ => seq('match', $.expr, withBraces(sepStartBy('|', $.match_case))),
 
     list_literal: $ => withBrackets(sepBy(',', $.expr)),
-
-    // TODO: nested operator definitions
-
   },
 
   extras: $ => [
     $.comment,
-    /\s/, // whitespace
+    /[\s]/, // whitespace
   ],
 
-  // conflicts: $ => [
-  // ],
+  conflicts: $ => [
+    // Can't disambguate the following situation without
+    // more lookahead:
+    //
+    //             local definition
+    //                vvvvvvvvv
+    //      val foo = val bar = func (42) ...
+    //                          ^^^^^^^^^
+    //         function application or value to outer assignment?
+    //
+    [$.expr, $.operator_application],
+
+    [$.ufcs_right_hand_side, $.operator_application],
+    [$.operator_definition, $.list_access],
+    [$.operator_definition, $.binary_expr],
+    [$.operator_definition, $.infix_or],
+    [$.operator_definition, $.infix_and],
+  ],
 
   precedences: $ => [
     [
-      'ufcs_app',
+      'ufcs',
       'list_access',
       'integer_neg',
       'integer_exp',
@@ -346,17 +415,19 @@ module.exports = grammar({
       'pair',
       'braced_all',
       'braced_any',
-      'nondet_choice', // TODO: docs don't specify precedence
+      'local_def',
       'if_else', // TODO: docs don't specify precedence
+      'lambda',
     ],
     [
-      'tuple',
       'parens',
+      'tuple',
     ],
     [
       'function_type',
       'operator_type',
       'variant_constr',
+      'tuple_type',
       'basic_type',
     ]
   ],
@@ -394,8 +465,23 @@ function sepBy(sep, rule) {
  *
  * @return {Rule}
  *
- */function sepEndBy1(sep, rule) {
-  return seq(sepBy1(sep, rule), optional(','))
+ */
+function sepEndBy1(sep, rule) {
+  return seq(sepBy1(sep, rule), optional(sep))
+}
+
+/**
+ * One or more `rule` separated by `sep` and optionally
+ * starting with `sep`.
+ *
+ * @param {string} sep
+ * @param {Rule} rule
+ *
+ * @return {Rule}
+ *
+ */
+function sepStartBy1(sep, rule) {
+  return seq(optional(sep), sepBy1(sep, rule))
 }
 
 /**
@@ -407,6 +493,20 @@ function sepBy(sep, rule) {
  *
  */function sepEndBy(sep, rule) {
   return optional(sepEndBy1(sep, rule))
+}
+
+/**
+ * Zero or more `rule` separated by `sep` and optionally
+ * starting with `sep`.
+ *
+ * @param {string} sep
+ * @param {Rule} rule
+ *
+ * @return {Rule}
+ *
+ */
+function sepStartBy(sep, rule) {
+  return optional(sepStartBy1(sep, rule))
 }
 
 /**
@@ -438,4 +538,3 @@ function withBraces(rule) {
 function withBrackets(rule) {
   return seq('[', rule, ']')
 }
-

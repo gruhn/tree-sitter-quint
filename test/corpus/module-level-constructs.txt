@@ -10,7 +10,7 @@ module my_module {
 
 (source_file
   (module_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (comment)))
 
 ========================
@@ -21,18 +21,19 @@ const N: int
 const Proc: Set[str]
 
 ---
+
 (source_file
   (constant_declaration
-    (identifier)
+    (qualified_identifier (identifier))
     (type
-      (identifier)))
+      (qualified_identifier (identifier))))
   (constant_declaration
-    (identifier)
+    (qualified_identifier (identifier))
     (type
       (polymorphic_type
-        (identifier)
+        (qualified_identifier (identifier))
         (type
-          (identifier))))))
+          (qualified_identifier (identifier)))))))
 
 ========================
 Assumptions
@@ -44,11 +45,11 @@ assume AtLeast4 = N >= 4
 
 (source_file
   (assumption
-    (identifier)
+    (qualified_identifier (identifier))
     (expr
       (binary_expr
         (expr
-          (identifier))
+          (qualified_identifier (identifier)))
         (expr
           (int_literal))))))
 
@@ -64,17 +65,17 @@ var isArmed: bool
   
 (source_file
   (variable_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (type
-      (identifier)))
+      (qualified_identifier (identifier))))
   (variable_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (type
-      (identifier)))
+      (qualified_identifier (identifier))))
   (variable_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (type
-      (identifier))))
+      (qualified_identifier (identifier)))))
 
 
 ========================
@@ -87,21 +88,25 @@ pure val Nodes: Set[int] = 1.to(10)
 
 (source_file
   (operator_definition
-    (identifier)
+    (qualified_identifier
+      (identifier))
     (type
       (polymorphic_type
-        (identifier)
+        (qualified_identifier
+          (identifier))
         (type
-          (identifier))))
+          (qualified_identifier
+            (identifier)))))
     (expr
       (binary_expr
         (expr
           (int_literal))
-        (operator_application
-          (identifier)
-          (expr
-            (int_literal)))))))
-
+        (ufcs_right_hand_side
+          (operator_application
+            (qualified_identifier
+              (identifier))
+            (expr
+              (int_literal))))))))
 
 ==========================================
 Definition with Optional Ending Semicolon
@@ -113,12 +118,12 @@ pure val eleven = 11;
 
 (source_file
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (expr
       (int_literal)))) 
 
 ========================
-Two-Argument Operator
+Zero-Argument Operator
 ========================
     
 pure def fst(): int = 1
@@ -127,10 +132,10 @@ pure def fst(): int = 1
 
 (source_file
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (typed_argument_list)
     (type
-      (identifier))
+      (qualified_identifier (identifier)))
     (expr
       (int_literal))))
 
@@ -145,18 +150,18 @@ pure def fst(x: int, y: int): int =
 
 (source_file
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (typed_argument_list
       (identifier)
       (type
-        (identifier))
+        (qualified_identifier (identifier)))
       (identifier)
       (type
-        (identifier)))
+        (qualified_identifier (identifier))))
     (type
-      (identifier))
+      (qualified_identifier (identifier)))
     (expr
-      (identifier))))
+      (qualified_identifier (identifier)))))
 
 ========================
 Higher-Order Operator
@@ -168,25 +173,25 @@ pure def F(G: a => b, x: a): b = G(x)
 
 (source_file
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (typed_argument_list
       (identifier)
       (type
         (operator_type
           (type
-            (identifier))
+            (qualified_identifier (identifier)))
           (type
-            (identifier))))
+            (qualified_identifier (identifier)))))
       (identifier)
       (type
-        (identifier)))
+        (qualified_identifier (identifier))))
     (type
-      (identifier))
+      (qualified_identifier (identifier)))
     (expr
       (operator_application
-        (identifier)
+        (qualified_identifier (identifier))
         (expr
-          (identifier))))))
+          (qualified_identifier (identifier)))))))
  
 ========================
 Stateful Variable
@@ -198,9 +203,9 @@ var timer: int
 
 (source_file
   (variable_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (type
-      (identifier))))
+      (qualified_identifier (identifier)))))
 
 ========================
 State Dependent Value
@@ -213,11 +218,11 @@ val isTimerPositive =
 
 (source_file
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (expr
       (binary_expr
         (expr
-          (identifier))
+          (qualified_identifier (identifier)))
         (expr
           (int_literal))))))
 
@@ -232,17 +237,17 @@ def hasExpired(timestamp: int) =
 
 (source_file
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (typed_argument_list
       (identifier)
       (type
-        (identifier)))
+        (qualified_identifier (identifier))))
     (expr
       (binary_expr
         (expr
-          (identifier))
+          (qualified_identifier (identifier)))
         (expr
-          (identifier))))))
+          (qualified_identifier (identifier)))))))
 
 ========================
 Action without Argument
@@ -255,11 +260,11 @@ action init =
 
 (source_file
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (expr
       (binary_expr
         (expr
-          (identifier))
+          (qualified_identifier (identifier)))
         (expr
           (int_literal))))))
 
@@ -274,21 +279,21 @@ action advance(unit: int) =
 
 (source_file
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (typed_argument_list
       (identifier)
       (type
-        (identifier)))
+        (qualified_identifier (identifier))))
     (expr
       (binary_expr
         (expr
-          (identifier))
+          (qualified_identifier (identifier)))
         (expr
           (binary_expr
             (expr
-              (identifier))
+              (qualified_identifier (identifier)))
             (expr
-              (identifier))))))))
+              (qualified_identifier (identifier)))))))))
 
 ========================
 Temporal Formula
@@ -301,14 +306,14 @@ temporal neverNegative =
 
 (source_file
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (expr
       (operator_application
-        (identifier)
+        (qualified_identifier (identifier))
         (expr
           (binary_expr
             (expr
-              (identifier))
+              (qualified_identifier (identifier)))
             (expr
               (int_literal))))))))
 
@@ -322,35 +327,66 @@ type INT_SET = Set[int]
 
 (source_file
   (type_alias
-    (identifier)
+    (qualified_identifier (identifier))
     (type
       (polymorphic_type
-        (identifier)
+        (qualified_identifier (identifier))
         (type
-          (identifier))))))
+          (qualified_identifier (identifier)))))))
 
 ========================
 Sum Type
 ========================
 
-type Elem = S(str) | I(int) | Nil
+type _ = S(str) | I(int) | Nil
+
+type _ = 
+  | S(str) // <-- optional leading pipe
+  | I(int) 
+  | Nil
  
 ---
 
 (source_file
   (type_alias
-    (identifier)
+    (qualified_identifier
+      (identifier))
     (sum_type
       (variant_constructor
-        (identifier)
+        (qualified_identifier
+          (identifier))
         (type
-          (identifier)))
+          (qualified_identifier
+            (identifier))))
       (variant_constructor
-        (identifier)
+        (qualified_identifier
+          (identifier))
         (type
-          (identifier)))
+          (qualified_identifier
+            (identifier))))
       (variant_constructor
-        (identifier)))))
+        (qualified_identifier
+          (identifier)))))
+  (type_alias
+    (qualified_identifier
+      (identifier))
+    (sum_type
+      (variant_constructor
+        (qualified_identifier
+          (identifier))
+        (type
+          (qualified_identifier
+            (identifier))))
+      (comment)
+      (variant_constructor
+        (qualified_identifier
+          (identifier))
+        (type
+          (qualified_identifier
+            (identifier))))
+      (variant_constructor
+        (qualified_identifier
+          (identifier))))))
 
 ========================
 Operator Type
@@ -365,37 +401,37 @@ type _ = (int, bool) => int
 
 (source_file
   (type_alias
-    (identifier)
+    (qualified_identifier (identifier))
     (type
       (operator_type
         (type
-          (identifier))
+          (qualified_identifier (identifier)))
         (type
-          (identifier)))))
+          (qualified_identifier (identifier))))))
   (type_alias
-    (identifier)
+    (qualified_identifier (identifier))
     (type
       (operator_type
         (type
-          (identifier)))))
+          (qualified_identifier (identifier))))))
   (type_alias
-    (identifier)
+    (qualified_identifier (identifier))
     (type
       (operator_type
         (type
-          (identifier))
+          (qualified_identifier (identifier)))
         (type
-          (identifier)))))
+          (qualified_identifier (identifier))))))
   (type_alias
-    (identifier)
+    (qualified_identifier (identifier))
     (type
       (operator_type
         (type
-          (identifier))
+          (qualified_identifier (identifier)))
         (type
-          (identifier))
+          (qualified_identifier (identifier)))
         (type
-          (identifier))))))
+          (qualified_identifier (identifier)))))))
 
 ========================
 Function Type
@@ -407,14 +443,230 @@ type _ = bool -> int -> int
 
 (source_file
   (type_alias
-    (identifier)
+    (qualified_identifier (identifier))
     (type
       (function_type
         (type
-          (identifier))
+          (qualified_identifier (identifier)))
         (type
           (function_type
             (type
-              (identifier))
+              (qualified_identifier (identifier)))
             (type
-              (identifier))))))))
+              (qualified_identifier (identifier)))))))))
+
+  
+========================
+Record Type
+========================
+
+type _ = {
+  address: str,
+  coins: Coins,
+}
+
+type _ = {}
+ 
+---
+
+(source_file
+  (type_alias
+    (qualified_identifier
+      (identifier))
+    (type
+      (record_type
+        (qualified_identifier
+          (identifier))
+        (type
+          (qualified_identifier
+            (identifier)))
+        (qualified_identifier
+          (identifier))
+        (type
+          (qualified_identifier
+            (identifier))))))
+  (type_alias
+    (qualified_identifier
+      (identifier))
+    (type
+      (record_type))))
+
+========================
+Tuple Type
+========================
+
+type _ = () 
+type _ = (int) 
+type _ = (int, str) 
+
+---
+
+(source_file
+  (type_alias
+    (qualified_identifier
+      (identifier))
+    (type
+      (tuple_type)))
+  (type_alias
+    (qualified_identifier
+      (identifier))
+    (type
+      (tuple_type
+        (type
+          (qualified_identifier
+            (identifier))))))
+  (type_alias
+    (qualified_identifier
+      (identifier))
+    (type
+      (tuple_type
+        (type
+          (qualified_identifier
+            (identifier)))
+        (type
+          (qualified_identifier
+            (identifier)))))))
+
+========================
+Qualified Identifier
+========================
+
+def Foo::bar = Foo::Bar::baz
+
+---
+
+(source_file
+  (operator_definition
+    (qualified_identifier
+      (identifier)
+      (identifier))
+    (expr
+      (qualified_identifier
+        (identifier)
+        (identifier)
+        (identifier)))))
+
+========================
+Imports
+========================
+
+module _ {
+  import Foo.bar.baz
+  import Math.*
+  import bank.* from "./bank"
+  import Foo as MyFoo
+  import A::Impl.*
+  import BinSearch(
+    INPUT_SEQ=[ 1, 2, 3, 4, 5, 6, 8, 9, 10, 33 ],
+    INPUT_KEY=7,
+    INT_WIDTH=16
+  ).*
+}
+
+---
+
+(source_file
+  (module_definition
+    (qualified_identifier
+      (identifier))
+    (import
+      (import_segment
+        (qualified_identifier
+          (identifier)))
+      (import_segment
+        (qualified_identifier
+          (identifier)))
+      (import_segment
+        (qualified_identifier
+          (identifier))))
+    (import
+      (import_segment
+        (qualified_identifier
+          (identifier)))
+      (import_segment))
+    (import
+      (import_segment
+        (qualified_identifier
+          (identifier)))
+      (import_segment)
+      (string
+        (string_fragment)))
+    (import
+      (import_segment
+        (qualified_identifier
+          (identifier)))
+      (qualified_identifier
+        (identifier)))
+    (import
+      (import_segment
+        (qualified_identifier
+          (identifier)
+          (identifier)))
+      (import_segment))
+    (import
+      (import_segment
+        (qualified_identifier
+          (identifier))
+        (import_segment_arguments
+          (qualified_identifier
+            (identifier))
+          (expr
+            (list_literal
+              (expr
+                (int_literal))
+              (expr
+                (int_literal))
+              (expr
+                (int_literal))
+              (expr
+                (int_literal))
+              (expr
+                (int_literal))
+              (expr
+                (int_literal))
+              (expr
+                (int_literal))
+              (expr
+                (int_literal))
+              (expr
+                (int_literal))
+              (expr
+                (int_literal))))
+          (qualified_identifier
+            (identifier))
+          (expr
+            (int_literal))
+          (qualified_identifier
+            (identifier))
+          (expr
+            (int_literal))))
+      (import_segment))))
+
+========================
+Exports
+========================
+
+module _ {
+  export Math.*
+  export Foo
+  export Foo as MyFoo
+}
+
+---
+
+(source_file
+  (module_definition
+    (qualified_identifier
+      (identifier))
+    (export
+      (qualified_identifier
+        (identifier)))
+    (export
+      (qualified_identifier
+        (identifier)))
+    (export
+      (qualified_identifier
+        (identifier))
+      (qualified_identifier
+        (identifier)))))
+

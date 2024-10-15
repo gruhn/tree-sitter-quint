@@ -9,11 +9,11 @@ val _ = false
 
 (source_file
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (expr
       (bool_literal)))
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (expr
       (bool_literal))))
 
@@ -29,15 +29,15 @@ val _ = 123_456_789
 
 (source_file
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (expr
       (int_literal)))
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (expr
       (int_literal)))
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (expr
       (int_literal))))
 
@@ -53,15 +53,15 @@ val _ = 0xAB_CD_EF
 
 (source_file
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (expr
       (int_literal)))
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (expr
       (int_literal)))
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (expr
       (int_literal))))
 
@@ -77,32 +77,41 @@ val h = (a,b,c) => c
 
 (source_file
   (operator_definition
-    (identifier)
+    (qualified_identifier
+      (identifier))
     (expr
       (lambda_expr
         (identifier)
         (expr
           (int_literal)))))
   (operator_definition
-    (identifier)
+    (qualified_identifier
+      (identifier))
     (expr
       (lambda_expr
         (expr
-          (identifier))
+          (qualified_identifier
+            (identifier)))
         (expr
-          (identifier)))))
+          (qualified_identifier
+            (identifier))))))
   (operator_definition
-    (identifier)
+    (qualified_identifier
+      (identifier))
     (expr
       (lambda_expr
         (expr
-          (identifier))
+          (qualified_identifier
+            (identifier)))
         (expr
-          (identifier))
+          (qualified_identifier
+            (identifier)))
         (expr
-          (identifier))
+          (qualified_identifier
+            (identifier)))
         (expr
-          (identifier))))))
+          (qualified_identifier
+            (identifier)))))))
 
 ====================================
 Operator Applications (Normal Form)
@@ -115,21 +124,21 @@ val _ = f(e_1, e_2, e_3)
 
 (source_file
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (expr
       (operator_application
-        (identifier))))
+        (qualified_identifier (identifier)))))
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (expr
       (operator_application
-        (identifier)
+        (qualified_identifier (identifier))
         (expr
-          (identifier))
+          (qualified_identifier (identifier)))
         (expr
-          (identifier))
+          (qualified_identifier (identifier)))
         (expr
-          (identifier))))))
+          (qualified_identifier (identifier)))))))
 
 =========================================
 Operator Applications (UFCS)
@@ -138,46 +147,188 @@ Operator Applications (UFCS)
 val _ = e_1.f()
 val _ = e_1.f(e_2, e_3)
 val _ = e_1.f(e_2).g(e_3)
+val _ = e_1.e_2.f()
 
 ---
 
 (source_file
   (operator_definition
-    (identifier)
+    (qualified_identifier
+      (identifier))
     (expr
       (binary_expr
         (expr
-          (identifier))
-        (operator_application
-          (identifier)))))
+          (qualified_identifier
+            (identifier)))
+        (ufcs_right_hand_side
+          (operator_application
+            (qualified_identifier
+              (identifier)))))))
   (operator_definition
-    (identifier)
+    (qualified_identifier
+      (identifier))
     (expr
       (binary_expr
         (expr
-          (identifier))
-        (operator_application
-          (identifier)
-          (expr
-            (identifier))
-          (expr
-            (identifier))))))
+          (qualified_identifier
+            (identifier)))
+        (ufcs_right_hand_side
+          (operator_application
+            (qualified_identifier
+              (identifier))
+            (expr
+              (qualified_identifier
+                (identifier)))
+            (expr
+              (qualified_identifier
+                (identifier))))))))
   (operator_definition
-    (identifier)
+    (qualified_identifier
+      (identifier))
     (expr
       (binary_expr
         (expr
           (binary_expr
             (expr
+              (qualified_identifier
+                (identifier)))
+            (ufcs_right_hand_side
+              (operator_application
+                (qualified_identifier
+                  (identifier))
+                (expr
+                  (qualified_identifier
+                    (identifier)))))))
+        (ufcs_right_hand_side
+          (operator_application
+            (qualified_identifier
               (identifier))
-            (operator_application
-              (identifier)
-              (expr
+            (expr
+              (qualified_identifier
+                (identifier))))))))
+  (operator_definition
+    (qualified_identifier
+      (identifier))
+    (expr
+      (binary_expr
+        (expr
+          (binary_expr
+            (expr
+              (qualified_identifier
+                (identifier)))
+            (ufcs_right_hand_side
+              (qualified_identifier
                 (identifier)))))
-        (operator_application
-          (identifier)
-          (expr
-            (identifier)))))))
+        (ufcs_right_hand_side
+          (operator_application
+            (qualified_identifier
+              (identifier))))))))
+
+=========================================
+Built-in Operator Applications (UFCS)
+=========================================
+
+action _ = all {
+  b.or(true),
+  not(b.and(false)),
+  b.implies(b),
+  b.iff(b),
+}
+
+---
+
+(source_file
+  (operator_definition
+    (qualified_identifier
+      (identifier))
+    (expr
+      (braced_all
+        (expr
+          (binary_expr
+            (expr
+              (qualified_identifier
+                (identifier)))
+            (ufcs_right_hand_side
+              (operator_application
+                (qualified_identifier
+                  (identifier))
+                (expr
+                  (bool_literal))))))
+        (expr
+          (operator_application
+            (qualified_identifier
+              (identifier))
+            (expr
+              (binary_expr
+                (expr
+                  (qualified_identifier
+                    (identifier)))
+                (ufcs_right_hand_side
+                  (operator_application
+                    (qualified_identifier
+                      (identifier))
+                    (expr
+                      (bool_literal))))))))
+        (expr
+          (binary_expr
+            (expr
+              (qualified_identifier
+                (identifier)))
+            (ufcs_right_hand_side
+              (operator_application
+                (qualified_identifier
+                  (identifier))
+                (expr
+                  (qualified_identifier
+                    (identifier)))))))
+        (expr
+          (binary_expr
+            (expr
+              (qualified_identifier
+                (identifier)))
+            (ufcs_right_hand_side
+              (operator_application
+                (qualified_identifier
+                  (identifier))
+                (expr
+                  (qualified_identifier
+                    (identifier)))))))))))
+
+=========================================
+UFCS Application - Multi Line
+=========================================
+
+def _ = list
+  .filter(f)
+  .map(g)
+
+---
+
+(source_file
+  (operator_definition
+    (qualified_identifier
+      (identifier))
+    (expr
+      (binary_expr
+        (expr
+          (binary_expr
+            (expr
+              (qualified_identifier
+                (identifier)))
+            (ufcs_right_hand_side
+              (operator_application
+                (qualified_identifier
+                  (identifier))
+                (expr
+                  (qualified_identifier
+                    (identifier)))))))
+        (ufcs_right_hand_side
+          (operator_application
+            (qualified_identifier
+              (identifier))
+            (expr
+              (qualified_identifier
+                (identifier)))))))))
 
 =========================================
 List Access via Index
@@ -192,43 +343,43 @@ val _ = grid[4][3]
 
 (source_file
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (expr
       (list_access
         (expr
-          (identifier))
+          (qualified_identifier (identifier)))
         (expr
           (int_literal)))))
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (expr
       (unary_expr
         (expr
           (list_access
             (expr
-              (identifier))
+              (qualified_identifier (identifier)))
             (expr
               (int_literal)))))))
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (expr
       (list_access
         (expr
-          (identifier))
+          (qualified_identifier (identifier)))
         (expr
           (binary_expr
             (expr
-              (identifier))
+              (qualified_identifier (identifier)))
             (expr
               (int_literal)))))))
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (expr
       (list_access
         (expr
           (list_access
             (expr
-              (identifier))
+              (qualified_identifier (identifier)))
             (expr
               (int_literal))))
         (expr
@@ -253,21 +404,21 @@ action _ = {
           
 (source_file
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (expr
       (expr
         (braced_and
           (expr
-            (identifier))
+            (qualified_identifier (identifier)))
           (expr
             (braced_or
               (expr
-                (identifier))
+                (qualified_identifier (identifier)))
               (expr
-                (identifier))
+                (qualified_identifier (identifier)))
               (comment)))
           (expr
-            (identifier)))))))
+            (qualified_identifier (identifier))))))))
 
 ========================
 If-Else Condition
@@ -286,31 +437,31 @@ val _ =
 
 (source_file
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (expr
       (if_else_condition
         (expr
-          (identifier))
+          (qualified_identifier (identifier)))
         (expr
-          (identifier))
+          (qualified_identifier (identifier)))
         (expr
-          (identifier)))))
+          (qualified_identifier (identifier))))))
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (expr
       (if_else_condition
         (expr
-          (identifier))
+          (qualified_identifier (identifier)))
         (expr
-          (identifier))
+          (qualified_identifier (identifier)))
         (expr
           (if_else_condition
             (expr
-              (identifier))
+              (qualified_identifier (identifier)))
             (expr
-              (identifier))
+              (qualified_identifier (identifier)))
             (expr
-              (identifier))))))))
+              (qualified_identifier (identifier)))))))))
 
 ========================
 Non-Deterministic Choice
@@ -326,20 +477,225 @@ action _ = {
 
 (source_file
   (operator_definition
-    (identifier)
+    (qualified_identifier
+      (identifier))
     (expr
       (expr
-        (nondet_choice
-          (identifier)
+        (local_operator_definition
+          (operator_definition
+            (qualified_identifier
+              (identifier))
+            (expr
+              (qualified_identifier
+                (identifier))))
           (expr
-            (identifier))
-          (expr
-            (nondet_choice
-              (identifier)
+            (local_operator_definition
+              (operator_definition
+                (qualified_identifier
+                  (identifier))
+                (expr
+                  (qualified_identifier
+                    (identifier))))
               (expr
+                (qualified_identifier
+                  (identifier))))))))))
+
+============================
+Local Variable Definition 1
+============================
+
+def _ = and {
+  val coins = GetAllBalances(addr)
+  coins.forall(denom => denom > 0),
+}
+ 
+---
+
+(source_file
+  (operator_definition
+    (qualified_identifier
+      (identifier))
+    (expr
+      (braced_and
+        (expr
+          (local_operator_definition
+            (operator_definition
+              (qualified_identifier
                 (identifier))
               (expr
-                (identifier)))))))))
+                (operator_application
+                  (qualified_identifier
+                    (identifier))
+                  (expr
+                    (qualified_identifier
+                      (identifier))))))
+            (expr
+              (binary_expr
+                (expr
+                  (qualified_identifier
+                    (identifier)))
+                (ufcs_right_hand_side
+                  (operator_application
+                    (qualified_identifier
+                      (identifier))
+                    (expr
+                      (lambda_expr
+                        (identifier)
+                        (expr
+                          (binary_expr
+                            (expr
+                              (qualified_identifier
+                                (identifier)))
+                            (expr
+                              (int_literal))))))))))))))))
+
+===================================================
+Local Definition (Function Call vs. Tuple Literal)
+===================================================
+
+// function call:
+val _ = val _ = foo.bar() 42
+
+// tuple literal:
+val _ = val _ = foo.bar () 
+
+---
+
+(source_file
+  (comment)
+  (operator_definition
+    (qualified_identifier
+      (identifier))
+    (expr
+      (local_operator_definition
+        (operator_definition
+          (qualified_identifier
+            (identifier))
+          (expr
+            (binary_expr
+              (expr
+                (qualified_identifier
+                  (identifier)))
+              (ufcs_right_hand_side
+                (operator_application
+                  (qualified_identifier
+                    (identifier)))))))
+        (expr
+          (int_literal)))))
+  (comment)
+  (operator_definition
+    (qualified_identifier
+      (identifier))
+    (expr
+      (local_operator_definition
+        (operator_definition
+          (qualified_identifier
+            (identifier))
+          (expr
+            (binary_expr
+              (expr
+                (qualified_identifier
+                  (identifier)))
+              (ufcs_right_hand_side
+                (qualified_identifier
+                  (identifier))))))
+        (expr
+          (tuple_literal))))))
+
+=================================================
+Local Definition (List Access vs. List Literal)
+=================================================
+
+// list access:
+val _ = val _ = list [3] 42
+
+// list literal:
+val _ = val _ = list [3]
+
+---
+
+(source_file
+  (comment)
+  (operator_definition
+    (qualified_identifier
+      (identifier))
+    (expr
+      (local_operator_definition
+        (operator_definition
+          (qualified_identifier
+            (identifier))
+          (expr
+            (list_access
+              (expr
+                (qualified_identifier
+                  (identifier)))
+              (expr
+                (int_literal)))))
+        (expr
+          (int_literal)))))
+  (comment)
+  (operator_definition
+    (qualified_identifier
+      (identifier))
+    (expr
+      (local_operator_definition
+        (operator_definition
+          (qualified_identifier
+            (identifier))
+          (expr
+            (qualified_identifier
+              (identifier))))
+        (expr
+          (list_literal
+            (expr
+              (int_literal))))))))
+
+=================================================
+Local Definition (Infix And vs Prefix And)
+=================================================
+
+// Infix Or:
+val _ = val _ = true and false 42
+
+// braced Or:
+val _ = val _ = true and { false } 
+
+---
+
+(source_file
+  (comment)
+  (operator_definition
+    (qualified_identifier
+      (identifier))
+    (expr
+      (local_operator_definition
+        (operator_definition
+          (qualified_identifier
+            (identifier))
+          (expr
+            (binary_expr
+              (infix_and
+                (expr
+                  (bool_literal))
+                (expr
+                  (bool_literal))))))
+        (expr
+          (int_literal)))))
+  (comment)
+  (operator_definition
+    (qualified_identifier
+      (identifier))
+    (expr
+      (local_operator_definition
+        (operator_definition
+          (qualified_identifier
+            (identifier))
+          (expr
+            (bool_literal)))
+        (expr
+          (braced_and
+            (expr
+              (bool_literal))))))))
 
 ===========================
 Map Constructor
@@ -351,51 +707,83 @@ val _ = Map(k_1 -> v_1, k_2 -> v_2, k_3 -> v_3)
 
 (source_file
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (expr
       (operator_application
-        (identifier)
+        (qualified_identifier (identifier))
         (expr
           (binary_expr
             (expr
-              (identifier))
+              (qualified_identifier (identifier)))
             (expr
-              (identifier))))
+              (qualified_identifier (identifier)))))
         (expr
           (binary_expr
             (expr
-              (identifier))
+              (qualified_identifier (identifier)))
             (expr
-              (identifier))))
+              (qualified_identifier (identifier)))))
         (expr
           (binary_expr
             (expr
-              (identifier))
+              (qualified_identifier (identifier)))
             (expr
-              (identifier))))))))
+              (qualified_identifier (identifier)))))))))
 
 ============================
 Record Constructor
 ============================
 
-val _ = { f_1: e_1, f_2: e_2, f_3: e_3 }
+val _ = { 
+  f_1: e_1, 
+  f_2: e_2, 
+  f_3: e_3 
+}
+
+val _ = { 
+  f_1: e_1, 
+  f_2: e_2, // <-- optional comma
+}
 
 ---
 
 (source_file
   (operator_definition
-    (identifier)
+    (qualified_identifier
+      (identifier))
     (expr
       (record_literal
-        (identifier)
-        (expr
+        (qualified_identifier
           (identifier))
-        (identifier)
         (expr
+          (qualified_identifier
+            (identifier)))
+        (qualified_identifier
           (identifier))
-        (identifier)
         (expr
-          (identifier))))))
+          (qualified_identifier
+            (identifier)))
+        (qualified_identifier
+          (identifier))
+        (expr
+          (qualified_identifier
+            (identifier))))))
+  (operator_definition
+    (qualified_identifier
+      (identifier))
+    (expr
+      (record_literal
+        (qualified_identifier
+          (identifier))
+        (expr
+          (qualified_identifier
+            (identifier)))
+        (qualified_identifier
+          (identifier))
+        (expr
+          (qualified_identifier
+            (identifier)))
+        (comment)))))
 
 ============================
 Record Spread
@@ -408,23 +796,23 @@ val _ = { f_1: e_1, ...r }
 
 (source_file
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (expr
       (record_literal
-        (identifier)
+        (qualified_identifier (identifier))
         (expr
-          (identifier))
-        (identifier)
+          (qualified_identifier (identifier)))
+        (qualified_identifier (identifier))
         (expr
-          (identifier)))))
+          (qualified_identifier (identifier))))))
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (expr
       (record_literal
-        (identifier)
+        (qualified_identifier (identifier))
         (expr
-          (identifier))
-        (identifier)))))
+          (qualified_identifier (identifier)))
+        (qualified_identifier (identifier))))))
 
 ============================
 Convert Set of Pairs to Map
@@ -436,12 +824,14 @@ val _ = Set((1, true), (2, false)).setToMap()
 
 (source_file
   (operator_definition
-    (identifier)
+    (qualified_identifier
+      (identifier))
     (expr
       (binary_expr
         (expr
           (operator_application
-            (identifier)
+            (qualified_identifier
+              (identifier))
             (expr
               (tuple_literal
                 (expr
@@ -454,40 +844,49 @@ val _ = Set((1, true), (2, false)).setToMap()
                   (int_literal))
                 (expr
                   (bool_literal))))))
-        (operator_application
-          (identifier))))))
+        (ufcs_right_hand_side
+          (operator_application
+            (qualified_identifier
+              (identifier))))))))
 
 ============================
 Tuple Constructor
 ============================
 
 val _ = ()
-val _ = (e_1)
+val _ = (e_1) // <-- not a tuple
 val _ = (e_1, e_2, e_3)
 
 ---
 
 (source_file
   (operator_definition
-    (identifier)
+    (qualified_identifier
+      (identifier))
     (expr
       (tuple_literal)))
   (operator_definition
-    (identifier)
+    (qualified_identifier
+      (identifier))
     (expr
-      (tuple_literal
-        (expr
+      (expr
+        (qualified_identifier
           (identifier)))))
+    (comment)
   (operator_definition
-    (identifier)
+    (qualified_identifier
+      (identifier))
     (expr
       (tuple_literal
         (expr
-          (identifier))
+          (qualified_identifier
+            (identifier)))
         (expr
-          (identifier))
+          (qualified_identifier
+            (identifier)))
         (expr
-          (identifier))))))
+          (qualified_identifier
+            (identifier)))))))
 
 ============================
 Match Expression
@@ -497,36 +896,81 @@ val _ =
   match L_k(x) {
     | L_1(x_1) => e_1
     | L_2(x_2) => e_2
-    | L_3(x_3) => e_3
+    | L_3      => e_3
   }
+
+// no pipe required if only one case:
+val expected = match Some(42) { _ => "default" }
+
+// also allow no cases:
+val unreachble = match void { }
 
 ---
 
 (source_file
   (operator_definition
-    (identifier)
+    (qualified_identifier
+      (identifier))
     (expr
       (match_expr
         (expr
           (operator_application
-            (identifier)
+            (qualified_identifier
+              (identifier))
             (expr
+              (qualified_identifier
+                (identifier)))))
+        (match_case
+          (qualified_identifier
+            (identifier))
+          (expr
+            (qualified_identifier
+              (identifier)))
+          (expr
+            (qualified_identifier
               (identifier))))
-        (identifier)
+        (match_case
+          (qualified_identifier
+            (identifier))
+          (expr
+            (qualified_identifier
+              (identifier)))
+          (expr
+            (qualified_identifier
+              (identifier))))
+        (match_case
+          (qualified_identifier
+            (identifier))
+          (expr
+            (qualified_identifier
+              (identifier)))))))
+  (comment)
+  (operator_definition
+    (qualified_identifier
+      (identifier))
+    (expr
+      (match_expr
         (expr
-          (identifier))
+          (operator_application
+            (qualified_identifier
+              (identifier))
+            (expr
+              (int_literal))))
+        (match_case
+          (qualified_identifier
+            (identifier))
+          (expr
+            (string
+              (string_fragment)))))))
+  (comment)
+  (operator_definition
+    (qualified_identifier
+      (identifier))
+    (expr
+      (match_expr
         (expr
-          (identifier))
-        (identifier)
-        (expr
-          (identifier))
-        (expr
-          (identifier))
-        (identifier)
-        (expr
-          (identifier))
-        (expr
-          (identifier))))))
+          (qualified_identifier
+            (identifier)))))))
 
 ============================
 List Constructor
@@ -540,24 +984,22 @@ val _ = [e_1, e_2, e_3]
 
 (source_file
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (expr
       (list_literal)))
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (expr
       (list_literal
         (expr
-          (identifier)))))
+          (qualified_identifier (identifier))))))
   (operator_definition
-    (identifier)
+    (qualified_identifier (identifier))
     (expr
       (list_literal
         (expr
-          (identifier))
+          (qualified_identifier (identifier)))
         (expr
-          (identifier))
+          (qualified_identifier (identifier)))
         (expr
-          (identifier))))))
-
-
+          (qualified_identifier (identifier)))))))

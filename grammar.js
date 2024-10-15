@@ -330,7 +330,7 @@ module.exports = grammar({
       $.infix_or,
       $.infix_iff,
       $.infix_implies,
-      prec.left ('delayed_assign', seq($.expr, '\' ='   , $.expr)),
+      prec.left ('delayed_assign', seq($.expr, '\'', '=', $.expr)),
       prec.left ('pair'          , seq($.expr, '->'     , $.expr)),
     ),
 

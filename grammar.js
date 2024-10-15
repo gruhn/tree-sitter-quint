@@ -360,9 +360,14 @@ module.exports = grammar({
 
     tuple_literal: $ => prec('tuple', withParens(sepBy(',', $.expr))),
 
-    match_expr: $ => seq('match', $.expr, withBraces(
-      repeat(seq('|', $.qualified_identifier, optional(withParens($.expr)), '=>', $.expr))
-    )),
+    match_case: $ => seq(
+      $.qualified_identifier, 
+      optional(withParens($.expr)), 
+      '=>', 
+      $.expr
+    ),
+
+    match_expr: $ => seq('match', $.expr, withBraces(sepStartBy('|', $.match_case))),
 
     list_literal: $ => withBrackets(sepBy(',', $.expr)),
   },
@@ -460,8 +465,23 @@ function sepBy(sep, rule) {
  *
  * @return {Rule}
  *
- */function sepEndBy1(sep, rule) {
-  return seq(sepBy1(sep, rule), optional(','))
+ */
+function sepEndBy1(sep, rule) {
+  return seq(sepBy1(sep, rule), optional(sep))
+}
+
+/**
+ * One or more `rule` separated by `sep` and optionally
+ * starting with `sep`.
+ *
+ * @param {string} sep
+ * @param {Rule} rule
+ *
+ * @return {Rule}
+ *
+ */
+function sepStartBy1(sep, rule) {
+  return seq(optional(sep), sepBy1(sep, rule))
 }
 
 /**
@@ -473,6 +493,20 @@ function sepBy(sep, rule) {
  *
  */function sepEndBy(sep, rule) {
   return optional(sepEndBy1(sep, rule))
+}
+
+/**
+ * Zero or more `rule` separated by `sep` and optionally
+ * starting with `sep`.
+ *
+ * @param {string} sep
+ * @param {Rule} rule
+ *
+ * @return {Rule}
+ *
+ */
+function sepStartBy(sep, rule) {
+  return optional(sepStartBy1(sep, rule))
 }
 
 /**

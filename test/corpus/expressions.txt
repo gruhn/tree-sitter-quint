@@ -899,6 +899,12 @@ val _ =
     | L_3      => e_3
   }
 
+// no pipe required if only one case:
+val expected = match Some(42) { _ => "default" }
+
+// also allow no cases:
+val unreachble = match void { }
+
 ---
 
 (source_file
@@ -914,24 +920,54 @@ val _ =
             (expr
               (qualified_identifier
                 (identifier)))))
-        (qualified_identifier
-          (identifier))
-        (expr
+        (match_case
           (qualified_identifier
-            (identifier)))
-        (expr
+            (identifier))
+          (expr
+            (qualified_identifier
+              (identifier)))
+          (expr
+            (qualified_identifier
+              (identifier))))
+        (match_case
           (qualified_identifier
-            (identifier)))
-        (qualified_identifier
-          (identifier))
-        (expr
+            (identifier))
+          (expr
+            (qualified_identifier
+              (identifier)))
+          (expr
+            (qualified_identifier
+              (identifier))))
+        (match_case
           (qualified_identifier
-            (identifier)))
+            (identifier))
+          (expr
+            (qualified_identifier
+              (identifier)))))))
+  (comment)
+  (operator_definition
+    (qualified_identifier
+      (identifier))
+    (expr
+      (match_expr
         (expr
+          (operator_application
+            (qualified_identifier
+              (identifier))
+            (expr
+              (int_literal))))
+        (match_case
           (qualified_identifier
-            (identifier)))
-        (qualified_identifier
-          (identifier))
+            (identifier))
+          (expr
+            (string
+              (string_fragment)))))))
+  (comment)
+  (operator_definition
+    (qualified_identifier
+      (identifier))
+    (expr
+      (match_expr
         (expr
           (qualified_identifier
             (identifier)))))))

@@ -205,13 +205,25 @@ module.exports = grammar({
 
     import: $ => seq(
       'import', 
-      sepBy1('.', choice($.qualified_identifier, '*')),
+      sepBy1('.', $.import_segment),
       optional(
         seq('as', $.qualified_identifier)
       ),
       optional( // when imported from another file
         seq('from', $.string)
       )    
+    ),
+
+    import_segment_arguments: $ => withParens(
+      sepBy(',', seq($.qualified_identifier, '=', $.expr))
+    ),
+
+    import_segment: $ => choice(
+      '*',
+      seq(
+        $.qualified_identifier, 
+        optional($.import_segment_arguments)
+      ),
     ),
 
     export: $ => seq(

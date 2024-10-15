@@ -548,6 +548,11 @@ module _ {
   import bank.* from "./bank"
   import Foo as MyFoo
   import A::Impl.*
+  import BinSearch(
+    INPUT_SEQ=[ 1, 2, 3, 4, 5, 6, 8, 9, 10, 33 ],
+    INPUT_KEY=7,
+    INT_WIDTH=16
+  ).*
 }
 
 ---
@@ -557,29 +562,77 @@ module _ {
     (qualified_identifier
       (identifier))
     (import
-      (qualified_identifier
-        (identifier))
-      (qualified_identifier
-        (identifier))
-      (qualified_identifier
-        (identifier)))
+      (import_segment
+        (qualified_identifier
+          (identifier)))
+      (import_segment
+        (qualified_identifier
+          (identifier)))
+      (import_segment
+        (qualified_identifier
+          (identifier))))
     (import
-      (qualified_identifier
-        (identifier)))
+      (import_segment
+        (qualified_identifier
+          (identifier)))
+      (import_segment))
     (import
-      (qualified_identifier
-        (identifier))
+      (import_segment
+        (qualified_identifier
+          (identifier)))
+      (import_segment)
       (string
         (string_fragment)))
     (import
-      (qualified_identifier
-        (identifier))
+      (import_segment
+        (qualified_identifier
+          (identifier)))
       (qualified_identifier
         (identifier)))
     (import
-      (qualified_identifier
-        (identifier)
-        (identifier)))))
+      (import_segment
+        (qualified_identifier
+          (identifier)
+          (identifier)))
+      (import_segment))
+    (import
+      (import_segment
+        (qualified_identifier
+          (identifier))
+        (import_segment_arguments
+          (qualified_identifier
+            (identifier))
+          (expr
+            (list_literal
+              (expr
+                (int_literal))
+              (expr
+                (int_literal))
+              (expr
+                (int_literal))
+              (expr
+                (int_literal))
+              (expr
+                (int_literal))
+              (expr
+                (int_literal))
+              (expr
+                (int_literal))
+              (expr
+                (int_literal))
+              (expr
+                (int_literal))
+              (expr
+                (int_literal))))
+          (qualified_identifier
+            (identifier))
+          (expr
+            (int_literal))
+          (qualified_identifier
+            (identifier))
+          (expr
+            (int_literal))))
+      (import_segment))))
 
 ========================
 Exports

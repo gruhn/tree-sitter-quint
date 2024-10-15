@@ -22,7 +22,10 @@ jobs:
           # create and push new commits:
           fetch-depth: '0'
       - name: Checkout master state
-        run: git checkout origin/master -- .
+        run: |- 
+          git checkout origin/master -- .
+          rm .gitignore
+          mv release.gitignore .gitignore
       - name: Set up tree-sitter CLI
         uses: tree-sitter/setup-action/cli@v1
       - name: Install parser dependencies
@@ -35,22 +38,11 @@ jobs:
         run: tree-sitter generate
       - name: Run Unit-Tests
         run: tree-sitter test
-      - name: Parse example files
-        run: bash parse-all-examples.sh
       - name: Push to Release Branch
         shell: bash
         run: |-
-          rm .gitignore
-          mv release.gitignore .gitignore
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
           git add --all 
           git commit -m "Release master at ${{ github.sha }}"
           git push 
-      # - name: Push to Release Branch
-      #   uses: s0/git-publish-subdir-action@develop
-      #   env:
-      #     REPO: self
-      #     BRANCH: release
-      #     FOLDER: .
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

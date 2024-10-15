@@ -6,6 +6,6 @@ grammar for
 Mainly with the goal to get editor support into
 [Helix](https://helix-editor.com/).
 
-To avoid tracking build artifacts in Git, 
+To avoid cluttering the repository with build artifacts, 
 the generated parser is not included on the `master` branch.
 Check the `release` branch instead.

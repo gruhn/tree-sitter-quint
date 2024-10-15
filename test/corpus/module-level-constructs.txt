@@ -464,6 +464,8 @@ type _ = {
   address: str,
   coins: Coins,
 }
+
+type _ = {}
  
 ---
 
@@ -482,7 +484,12 @@ type _ = {
           (identifier))
         (type
           (qualified_identifier
-            (identifier)))))))
+            (identifier))))))
+  (type_alias
+    (qualified_identifier
+      (identifier))
+    (type
+      (record_type))))
 
 ========================
 Tuple Type

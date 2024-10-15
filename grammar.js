@@ -117,7 +117,7 @@ module.exports = grammar({
     ),
 
     record_type: $ => withBraces(
-      sepEndBy1(',', seq(
+      sepEndBy(',', seq(
         seq($.qualified_identifier, ':', $.type),
       ))
     ),

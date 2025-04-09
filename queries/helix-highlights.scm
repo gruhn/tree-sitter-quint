@@ -94,7 +94,7 @@
 
 (variant_constructor) @type.enum.variant
 
-(type) @type
+(type (qualified_identifier (identifier))) @type
 (int_literal) @constant.numeric.integer
 (comment) @comment
 (string) @string
